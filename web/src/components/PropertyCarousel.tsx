@@ -17,7 +17,12 @@ const TILT = 42; // deg turned away per card of offset
 const DESIGN_WIDTH = 2 * SPACING + 440; // centre card + a neighbour either side
 const AUTO_SPEED = 0.0031; // cards per frame — the design's drift rate
 const RESUME_DELAY = 4000;
-const DRAG_THRESHOLD = 4; // px of travel before a press counts as a drag
+/**
+ * px of travel before a press counts as a drag rather than a click. Generous
+ * on purpose: a drag swallows the click, and a real hand wobbles several px
+ * while clicking, so a tight threshold eats clicks on the cards' links.
+ */
+const DRAG_THRESHOLD = 12;
 
 const pad2 = (n: number) => String(n).padStart(2, "0");
 
@@ -47,6 +52,8 @@ export function PropertyCarousel({ properties }: { properties: Property[] }) {
   const autoRef = useRef(true);
   const pressedRef = useRef(false);
   const draggingRef = useRef(false);
+  /** Whether the press that just ended was a drag, so its click can be eaten. */
+  const draggedRef = useRef(false);
   const dragStartRef = useRef({ x: 0, position: 0 });
   const resumeRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -187,63 +194,80 @@ export function PropertyCarousel({ properties }: { properties: Property[] }) {
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     pressedRef.current = true;
+    draggedRef.current = false;
     autoRef.current = false; // freeze the drift under the finger
     dragStartRef.current = { x: e.clientX, position: positionRef.current };
   };
 
-  /**
-   * A press only becomes a drag once it has travelled. Capturing the pointer on
-   * pointerdown instead would retarget the click that follows to the stage, so
-   * the front card's link would never open.
-   */
-  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!pressedRef.current) return;
-    const dx = e.clientX - dragStartRef.current.x;
+  /** A press only becomes a drag once it has travelled past the threshold. */
+  const onPointerMove = useCallback(
+    (e: PointerEvent) => {
+      if (!pressedRef.current) return;
+      const dx = e.clientX - dragStartRef.current.x;
 
-    if (!draggingRef.current) {
-      if (Math.abs(dx) < DRAG_THRESHOLD) return;
-      draggingRef.current = true;
-      setAnimated(false);
-      stageRef.current?.setAttribute("data-dragging", "true");
-      try {
-        stageRef.current?.setPointerCapture(e.pointerId);
-      } catch {
-        // Pointer capture is a nicety; dragging still works without it.
+      if (!draggingRef.current) {
+        if (Math.abs(dx) < DRAG_THRESHOLD) return;
+        draggingRef.current = true;
+        setAnimated(false);
+        stageRef.current?.setAttribute("data-dragging", "true");
       }
-    }
 
-    // Divide by SPACING so the front card tracks the pointer 1:1.
-    positionRef.current = dragStartRef.current.position - dx / SPACING;
-    render3d();
-  };
+      // Divide by SPACING so the front card tracks the pointer 1:1.
+      positionRef.current = dragStartRef.current.position - dx / SPACING;
+      render3d();
+    },
+    [render3d, setAnimated],
+  );
 
   const endPress = useCallback(() => {
     if (!pressedRef.current) return;
     pressedRef.current = false;
 
-    // A tap: let the click reach the card and just let the drift resume.
+    // A tap: let the click through to the card and let the drift resume.
     if (!draggingRef.current) {
       pauseAuto();
       return;
     }
 
+    draggedRef.current = true; // swallow the click this drag is about to fire
     draggingRef.current = false;
     stageRef.current?.setAttribute("data-dragging", "false");
     snapTo(Math.round(positionRef.current));
   }, [pauseAuto, snapTo]);
 
   /**
-   * Watched on the window rather than the stage, so a drag that travels off the
-   * stage still settles on release instead of leaving the carousel stuck.
+   * The move and release are watched on the window so a drag that travels off
+   * the stage keeps tracking and still settles. setPointerCapture would do the
+   * same, but it retargets the click that follows to the stage — which is how
+   * the cards' links were being swallowed.
    */
   useEffect(() => {
+    window.addEventListener("pointermove", onPointerMove);
     window.addEventListener("pointerup", endPress);
     window.addEventListener("pointercancel", endPress);
     return () => {
+      window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", endPress);
       window.removeEventListener("pointercancel", endPress);
     };
-  }, [endPress]);
+  }, [endPress, onPointerMove]);
+
+  /** Keeps the click that ends a drag from opening the card it landed on. */
+  const onClickCapture = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!draggedRef.current) return;
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  /**
+   * Images and links are natively draggable, so pressing one and moving even a
+   * few px hands the gesture to the browser's drag-and-drop: it cancels the
+   * pointer stream and never fires the click, which ate both the carousel drag
+   * and the cards' links.
+   */
+  const onDragStart = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
 
   return (
     <div className={styles.page}>
@@ -272,7 +296,8 @@ export function PropertyCarousel({ properties }: { properties: Property[] }) {
         ref={stageRef}
         className={styles.stage}
         onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
+        onClickCapture={onClickCapture}
+        onDragStart={onDragStart}
       >
         <div ref={scalerRef} className={styles.scaler}>
           <div ref={prismRef} className={styles.prism} data-animated="false">
