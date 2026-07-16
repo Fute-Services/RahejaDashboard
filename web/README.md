@@ -28,10 +28,14 @@ Importing `Fute-Services/RahejaDashboard` for the first time:
 
 Pushes to `master` then deploy to production; other branches get preview URLs.
 
-`vercel.json` only pins the framework and puts serverless functions in Mumbai
-(`bom1`), nearest the audience. It's near-redundant today — the page is fully
-static, so there are no functions to place — but it matters once the property
-API arrives (TRD §2).
+There is deliberately no `vercel.json` — Next.js needs no config on Vercel, and
+Root Directory (the one thing that actually matters here) can only be set in the
+project settings, not in that file.
+
+**Symptom to recognise:** if the deploy succeeds but every URL returns
+`404: NOT_FOUND`, Root Directory is wrong. Vercel found no framework at the repo
+root, treated it as a plain static folder, and there's no `index.html` there to
+serve.
 
 ## Layout
 
