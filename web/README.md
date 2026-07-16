@@ -11,6 +11,28 @@ npm run dev      # http://localhost:3000
 npm run build
 ```
 
+## Deploy (Vercel)
+
+The app lives in `web/`, not the repo root, so **Root Directory must be set to
+`web`** in the Vercel project settings. That setting is what makes the deploy
+work — it cannot be set from `vercel.json`, and without it the build fails with
+"No Next.js version detected".
+
+Importing `Fute-Services/RahejaDashboard` for the first time:
+
+1. Vercel → Add New → Project → import the repo.
+2. **Root Directory → Edit → select `web`.** Everything else auto-detects
+   (framework Next.js, `next build`, output `.next`).
+3. Deploy. No environment variables are needed yet — the property data is
+   hardcoded and there's no API.
+
+Pushes to `master` then deploy to production; other branches get preview URLs.
+
+`vercel.json` only pins the framework and puts serverless functions in Mumbai
+(`bom1`), nearest the audience. It's near-redundant today — the page is fully
+static, so there are no functions to place — but it matters once the property
+API arrives (TRD §2).
+
 ## Layout
 
 | Path | What it is |
