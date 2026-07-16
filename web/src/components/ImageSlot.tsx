@@ -16,7 +16,14 @@ export function ImageSlot({ placeholder, src, alt }: ImageSlotProps) {
     <div className={styles.slot}>
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element -- src is arbitrary/remote until media storage lands (TRD §2)
-        <img className={styles.image} src={src} alt={alt ?? placeholder} />
+        <img
+          className={styles.image}
+          src={src}
+          alt={alt ?? placeholder}
+          // Chrome's native image drag would fire pointercancel and kill the
+          // carousel drag the moment it starts.
+          draggable={false}
+        />
       ) : (
         <span className={styles.placeholder}>{placeholder}</span>
       )}
