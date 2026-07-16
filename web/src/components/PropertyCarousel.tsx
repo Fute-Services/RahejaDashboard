@@ -316,7 +316,7 @@ export function PropertyCarousel({ properties }: { properties: Property[] }) {
               onClick={() => goTo(i)}
             >
               <span className={styles.listIndex}>{pad2(i + 1)}</span>
-              {property.name}
+              {property.listName ?? property.name}
             </button>
           ))}
         </nav>
