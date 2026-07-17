@@ -281,6 +281,14 @@ export function PropertyCarousel({ properties }: { properties: Property[] }) {
           </div>
           <h1 className={styles.title}>Raheja</h1>
         </div>
+        {/* eslint-disable-next-line @next/next/no-img-element -- raw <img> to match ImageSlot; the logo is a bundled asset, so no optimisation is needed */}
+        <img
+          className={styles.corpLogo}
+          src="/brand/k-raheja-corp.png"
+          width={198}
+          height={258}
+          alt="K Raheja Corp"
+        />
         <div className={styles.meta}>
           <div className={styles.counter}>
             <span>{pad2(index + 1)}</span>

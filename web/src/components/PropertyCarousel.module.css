@@ -62,6 +62,18 @@
   max-width: 12ch;
 }
 
+/*
+ * Sits between the title and the meta block, so `space-between` reserves its
+ * space and it can never overlap either. Centred on the taller of the two
+ * rather than pinned to the header's flex-start top edge.
+ */
+.corpLogo {
+  align-self: center;
+  height: 64px;
+  width: auto;
+  flex: none;
+}
+
 .meta {
   text-align: right;
   font-family: var(--font-mono), monospace;
@@ -293,6 +305,11 @@
 @media (max-width: 640px) {
   .header {
     padding: 24px 20px 0;
+  }
+
+  /* The header already wraps this narrow; keep the logo from dwarfing the title. */
+  .corpLogo {
+    height: 48px;
   }
 
   .footer {
