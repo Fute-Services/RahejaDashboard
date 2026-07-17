@@ -21,10 +21,12 @@ export type Property = {
  */
 export const properties: Property[] = [
   {
-    slug: "raheja-vistas",
-    name: "Raheja Vistas",
-    location: "Pune",
-    href: "#",
+    slug: "cignus",
+    name: "Cignus",
+    listName: "Raheja Cignus",
+    location: "Powai, Mumbai",
+    href: "https://project-cignus.vercel.app/",
+    image: "/properties/cignus.jpg",
   },
   {
     slug: "raheja-atlantis",
