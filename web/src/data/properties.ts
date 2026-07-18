@@ -5,7 +5,7 @@ export type Property = {
   name: string;
   /**
    * Shown in the footer list, where entries read as a set and so carry the
-   * "Raheja" prefix the card can drop. Defaults to `name`.
+   * "Kraheja" prefix the card can drop. Defaults to `name`.
    */
   listName?: string;
   location: string;
@@ -23,27 +23,15 @@ export const properties: Property[] = [
   {
     slug: "cignus",
     name: "Cignus",
-    listName: "Raheja Cignus",
+    listName: "Kraheja Cignus",
     location: "Powai, Mumbai",
     href: "https://project-cignus.vercel.app/",
     image: "/properties/cignus.jpg",
   },
   {
-    slug: "raheja-atlantis",
-    name: "Raheja Atlantis",
-    location: "Gurugram",
-    href: "#",
-  },
-  {
-    slug: "raheja-revanta",
-    name: "Raheja Revanta",
-    location: "Gurugram",
-    href: "#",
-  },
-  {
     slug: "kr-pune",
     name: "KR Pune",
-    listName: "Raheja KR Pune",
+    listName: "Kraheja KR Pune",
     location: "Pune",
     href: "https://krpune1.futeservices.in/",
     image: "/properties/kr-pune.jpg",

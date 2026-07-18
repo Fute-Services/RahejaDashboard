@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { Property } from "@/data/properties";
+import { AUTH_COOKIE, LOGIN_PATH } from "@/lib/auth";
 import { ImageSlot } from "./ImageSlot";
 import styles from "./PropertyCarousel.module.css";
 
@@ -42,6 +44,14 @@ function faceTransform(offset: number) {
 
 export function PropertyCarousel({ properties }: { properties: Property[] }) {
   const count = properties.length;
+  const router = useRouter();
+
+  /** Clears the session cookie; the middleware then bounces us to the login. */
+  const signOut = useCallback(() => {
+    document.cookie = `${AUTH_COOKIE}=; path=/; max-age=0; samesite=lax`;
+    router.push(LOGIN_PATH);
+    router.refresh();
+  }, [router]);
 
   const stageRef = useRef<HTMLDivElement>(null);
   const scalerRef = useRef<HTMLDivElement>(null);
@@ -279,7 +289,7 @@ export function PropertyCarousel({ properties }: { properties: Property[] }) {
             <div className={styles.diamond} />
             <span className={styles.brandName}>Property Index</span>
           </div>
-          <h1 className={styles.title}>Raheja</h1>
+          <h1 className={styles.title}>KRAHEJA</h1>
         </div>
         {/* eslint-disable-next-line @next/next/no-img-element -- raw <img> to match ImageSlot; the logo is a bundled asset, so no optimisation is needed */}
         <img
@@ -296,7 +306,7 @@ export function PropertyCarousel({ properties }: { properties: Property[] }) {
               &nbsp;/&nbsp;{pad2(count)}
             </span>
           </div>
-          <div className={styles.tagline}>Raheja Portfolio &middot; 2026</div>
+          <div className={styles.tagline}>Kraheja Portfolio &middot; 2026</div>
         </div>
       </header>
 
@@ -385,6 +395,15 @@ export function PropertyCarousel({ properties }: { properties: Property[] }) {
           ))}
         </nav>
       </footer>
+
+      <button
+        type="button"
+        className={styles.signout}
+        onClick={signOut}
+        aria-label="Log out"
+      >
+        Log out ↗
+      </button>
     </div>
   );
 }
