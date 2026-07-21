@@ -72,40 +72,16 @@
 
 /* ---------- left panel ---------- */
 
-/*
- * The hero panel: a real property (the Cignus tower) behind a dark gradient, so
- * the sign-in reads as a premium real-estate portal rather than a blank form.
- * The overlay keeps the light text legible over the image.
- */
 .aside {
   position: relative;
   padding: 44px 48px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 460px;
-  color: #f4f1ea;
-  background: #10141d url("/properties/cignus.jpg") center / cover no-repeat;
-  overflow: hidden;
-}
-
-.aside::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background: linear-gradient(
-    165deg,
-    rgba(14, 19, 30, 0.55) 0%,
-    rgba(14, 19, 30, 0.74) 52%,
-    rgba(12, 16, 26, 0.92) 100%
-  );
-}
-
-/* Lift all content above the gradient overlay. */
-.aside > * {
-  position: relative;
-  z-index: 1;
+  background: #ece8dd;
+  background-image: radial-gradient(#d4cfbf 1px, transparent 1px);
+  background-size: 20px 20px;
+  min-height: 440px;
 }
 
 .asideTop {
@@ -117,13 +93,13 @@
 .eyebrow {
   font-size: 11px;
   letter-spacing: 0.22em;
-  color: rgba(255, 255, 255, 0.65);
+  color: #7d7a70;
 }
 
 .welcome {
   font-size: 11px;
   letter-spacing: 0.22em;
-  color: #a9b6ff;
+  color: #4b63d6;
   margin-bottom: 18px;
 }
 
@@ -133,13 +109,12 @@
   line-height: 0.95;
   letter-spacing: -0.02em;
   margin-bottom: 20px;
-  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.35);
 }
 
 .lede {
   font-size: 15px;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.85);
+  color: #6b675d;
   max-width: 300px;
 }
 
@@ -151,7 +126,7 @@
 
 .rule {
   height: 1px;
-  background: rgba(255, 255, 255, 0.22);
+  background: #d4cfbf;
 }
 
 .stats {
@@ -159,7 +134,7 @@
   gap: 28px;
   font-size: 10px;
   letter-spacing: 0.18em;
-  color: rgba(255, 255, 255, 0.62);
+  color: #9c988c;
 }
 
 /* ---------- form panel ---------- */
