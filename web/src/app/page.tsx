@@ -1,6 +1,5 @@
-import { PropertyCarousel } from "@/components/PropertyCarousel";
-import { properties } from "@/data/properties";
+import { IndiaMapLanding } from "@/components/IndiaMapLanding";
 
 export default function Home() {
-  return <PropertyCarousel properties={properties} />;
+  return <IndiaMapLanding />;
 }

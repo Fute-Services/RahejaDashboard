@@ -1,0 +1,207 @@
+/* Holds the map plus the floating view switcher. */
+.wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Fills the wrapper; the landing shell owns the viewport height. */
+.map {
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+  z-index: 0;
+  /* Eases in over the loading placeholder instead of popping in. */
+  animation: mapFadeIn 0.5s ease both;
+}
+
+@keyframes mapFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---------- city pins ---------- */
+
+/*
+ * The icon box is 0×0 at the coordinate (see IndiaMap.tsx). The pill re-centres
+ * itself so its dot lands on the exact point regardless of label width.
+ */
+.pinWrap {
+  background: none;
+  border: none;
+}
+
+.pin {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  padding: 6px 13px 6px 8px;
+  background: #fff;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  box-shadow: 0 10px 24px -12px oklch(0.4 0.02 95 / 0.55);
+  font-family: var(--font-grotesk), system-ui, sans-serif;
+  cursor: pointer;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+}
+
+.pin:hover {
+  transform: translate(-50%, calc(-50% - 3px));
+  border-color: var(--ink);
+  box-shadow: 0 16px 30px -12px oklch(0.4 0.02 95 / 0.7);
+}
+
+/* Accent dot with a soft pulsing halo — the "you are here" beat. */
+.pinDot {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--link);
+  box-shadow: 0 0 0 3px oklch(0.55 0.12 255 / 0.18);
+  flex: none;
+}
+
+.pinDot::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 2px solid var(--link);
+  opacity: 0;
+  animation: pinPulse 2.4s ease-out infinite;
+}
+
+@keyframes pinPulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.55;
+  }
+  70% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Count badge, shown only when a city holds more than one project. */
+.pinBadge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 17px;
+  text-align: center;
+}
+
+.pinLabel {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+/* ---------- view switcher (bottom-centre) ---------- */
+
+.switcher {
+  position: absolute;
+  bottom: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  background: oklch(1 0 0 / 0.86);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  box-shadow: 0 12px 30px -14px oklch(0.4 0.02 95 / 0.55);
+}
+
+.switchBtn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  transition: background 0.15s, color 0.15s;
+}
+
+.switchBtn:hover {
+  color: var(--ink);
+}
+
+.switchBtn[aria-pressed="true"] {
+  background: var(--ink);
+  color: #fff;
+}
+
+/* ---------- Leaflet chrome, restyled minimal ---------- */
+
+.tip:global(.leaflet-tooltip) {
+  background: var(--ink);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 9px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: 0 8px 20px -10px oklch(0.2 0.02 95 / 0.6);
+}
+
+.tip:global(.leaflet-tooltip-top)::before {
+  border-top-color: var(--ink);
+}
+
+/*
+ * Strip Leaflet's default white box around HTML markers. The two-class selector
+ * (local .pinWrap + Leaflet's .leaflet-div-icon) outranks Leaflet's own rule, so
+ * it wins regardless of stylesheet load order. Attribution/zoom-control overrides
+ * live in globals.css (a module file can't hold pure :global selectors).
+ */
+.pinWrap:global(.leaflet-div-icon) {
+  background: transparent;
+  border: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pin,
+  .pin:hover {
+    transition: none;
+  }
+
+  .pinDot::before,
+  .map {
+    animation: none;
+  }
+}

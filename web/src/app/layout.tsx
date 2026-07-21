@@ -17,7 +17,7 @@ const spaceMono = Space_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Kraheja — Property Index",
+  title: "K Raheja Corp — Property Portfolio",
   description:
     "A showcase of the Kraheja property portfolio — browse each property and continue to its own site.",
 };

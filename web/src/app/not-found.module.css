@@ -1,0 +1,42 @@
+.page {
+  height: 100vh;
+  height: 100dvh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-grotesk), system-ui, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+  padding: 24px;
+}
+
+.brandLogo {
+  height: 50px;
+  width: auto;
+  display: block;
+  margin-bottom: 18px;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(26px, 4vw, 40px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.body {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 15px;
+}
+
+.link {
+  margin-top: 10px;
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}

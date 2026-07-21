@@ -17,8 +17,7 @@ const SPACING = 430; // px along X per card of offset
 const DEPTH = 200; // px pushed back per card of offset
 const TILT = 42; // deg turned away per card of offset
 const DESIGN_WIDTH = 2 * SPACING + 440; // centre card + a neighbour either side
-const AUTO_SPEED = 0.0031; // cards per frame — the design's drift rate
-const RESUME_DELAY = 4000;
+const AUTO_SPEED = 0.0031; // cards per frame — retained for the (now idle) drift loop
 /**
  * px of travel before a press counts as a drag rather than a click. Generous
  * on purpose: a drag swallows the click, and a real hand wobbles several px
@@ -42,7 +41,17 @@ function faceTransform(offset: number) {
   );
 }
 
-export function PropertyCarousel({ properties }: { properties: Property[] }) {
+export function PropertyCarousel({
+  properties,
+  backHref,
+  cityLabel,
+}: {
+  properties: Property[];
+  /** When set, shows a "back" button that navigates here (e.g. "/" for the map). */
+  backHref?: string;
+  /** When set, names the city this list is filtered to, shown under the title. */
+  cityLabel?: string;
+}) {
   const count = properties.length;
   const router = useRouter();
 
@@ -59,7 +68,8 @@ export function PropertyCarousel({ properties }: { properties: Property[] }) {
 
   /** Which card is at the front, as a float — 1.5 means midway between 1 and 2. */
   const positionRef = useRef(0);
-  const autoRef = useRef(true);
+  // Static showcase: the arc never drifts on its own; only drag/arrows/list move it.
+  const autoRef = useRef(false);
   const pressedRef = useRef(false);
   const draggingRef = useRef(false);
   /** Whether the press that just ended was a drag, so its click can be eaten. */
@@ -98,21 +108,23 @@ export function PropertyCarousel({ properties }: { properties: Property[] }) {
         card.style.opacity = Math.max(0.08, 1 - distance * 0.5).toFixed(3);
         card.style.filter =
           distance > 0.4 ? `blur(${((distance - 0.4) * 3).toFixed(1)}px)` : "none";
+        // Marks the focused card so CSS can give it the red hero glow.
+        card.dataset.front = distance < 0.5 ? "true" : "false";
       }
     });
 
     setIndex(((Math.round(position) % count) + count) % count);
   }, [count]);
 
-  /** Auto-rotation resumes only after the user has been idle for a moment. */
+  /**
+   * The showcase is static, so this only clears any pending timer — the drift
+   * is never re-armed. Kept as the single "user touched it" hook the handlers
+   * already call.
+   */
   const pauseAuto = useCallback(() => {
     autoRef.current = false;
     if (resumeRef.current) clearTimeout(resumeRef.current);
-    resumeRef.current = setTimeout(() => {
-      autoRef.current = true;
-      setAnimated(false);
-    }, RESUME_DELAY);
-  }, [setAnimated]);
+  }, []);
 
   const snapTo = useCallback(
     (position: number) => {
@@ -285,20 +297,21 @@ export function PropertyCarousel({ properties }: { properties: Property[] }) {
 
       <header className={styles.header}>
         <div>
-          <div className={styles.brand}>
-            <div className={styles.diamond} />
-            <span className={styles.brandName}>Property Index</span>
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element -- raw <img> to match ImageSlot; the logo is a bundled asset, so no optimisation is needed */}
+          <img
+            className={styles.brandLogo}
+            src="/brand/k-raheja-corp.png"
+            width={198}
+            height={258}
+            alt="K Raheja Corp"
+          />
           <h1 className={styles.title}>KRAHEJA</h1>
+          {cityLabel && (
+            <p className={styles.cityLabel}>
+              {cityLabel} &middot; {count} project{count === 1 ? "" : "s"}
+            </p>
+          )}
         </div>
-        {/* eslint-disable-next-line @next/next/no-img-element -- raw <img> to match ImageSlot; the logo is a bundled asset, so no optimisation is needed */}
-        <img
-          className={styles.corpLogo}
-          src="/brand/k-raheja-corp.png"
-          width={198}
-          height={258}
-          alt="K Raheja Corp"
-        />
         <div className={styles.meta}>
           <div className={styles.counter}>
             <span>{pad2(index + 1)}</span>
@@ -395,6 +408,17 @@ export function PropertyCarousel({ properties }: { properties: Property[] }) {
           ))}
         </nav>
       </footer>
+
+      {backHref && (
+        <button
+          type="button"
+          className={styles.back}
+          onClick={() => router.push(backHref)}
+          aria-label="Back to the map"
+        >
+          ← Map
+        </button>
+      )}
 
       <button
         type="button"

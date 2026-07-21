@@ -29,21 +29,10 @@
   padding: 24px 40px;
 }
 
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.diamond {
-  color: #4b63d6;
-  font-size: 13px;
-}
-
-.brandName {
-  font-size: 12px;
-  letter-spacing: 0.22em;
-  color: #5c5850;
+.brandLogo {
+  height: 46px;
+  width: auto;
+  display: block;
 }
 
 .meta {
@@ -51,12 +40,6 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 4px;
-}
-
-.metaCorp {
-  font-size: 11px;
-  letter-spacing: 0.22em;
-  color: #4a8f5f;
 }
 
 .metaAccess {
@@ -279,6 +262,27 @@
 
 .submit:hover {
   background: #3a4fb8;
+}
+
+.submit:disabled {
+  cursor: default;
+  background: #4b63d6;
+  opacity: 0.9;
+}
+
+.spinner {
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .arrow {

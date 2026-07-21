@@ -35,3 +35,23 @@ a:hover {
 button {
   font-family: inherit;
 }
+
+/*
+ * Leaflet zoom-control chrome, quieted to match the minimal theme. Scoped under
+ * .leaflet-container (Leaflet's own wrapper) so the two-class specificity wins
+ * over Leaflet's defaults no matter which stylesheet loads last. This lives here
+ * rather than in a CSS module, which can't hold pure global selectors.
+ */
+.leaflet-container .leaflet-control-zoom a {
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+/*
+ * Crossfade base layers instead of snapping: when a layer's opacity toggles
+ * between views, its tiles ease rather than cut. Also softens each tile's
+ * first paint.
+ */
+.leaflet-container .leaflet-tile {
+  transition: opacity 0.45s ease;
+}

@@ -61,6 +61,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // No auth backend yet: match the one hardcoded account, and on success mark
   // the session with a cookie the middleware checks to gate every other route.
@@ -73,6 +74,9 @@ export default function LoginPage() {
       setError("Incorrect email or password.");
       return;
     }
+    // Loading stays on through the route change — the home map takes a beat to
+    // load, so the spinner covers that gap instead of a blank flash.
+    setLoading(true);
     document.cookie = `${AUTH_COOKIE}=1; path=/; max-age=${AUTH_MAX_AGE}; samesite=lax`;
     router.push("/");
     router.refresh();
@@ -81,16 +85,15 @@ export default function LoginPage() {
   return (
     <div className={`${styles.page} ${jetbrains.variable}`}>
       <header className={styles.header}>
-        <div className={styles.brand}>
-          <span className={styles.diamond}>◆</span>
-          <span className={`${styles.mono} ${styles.brandName}`}>
-            PROPERTY&nbsp;INDEX
-          </span>
-        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element -- bundled brand asset; keeps the site's raw-<img> convention */}
+        <img
+          className={styles.brandLogo}
+          src="/brand/k-raheja-corp.png"
+          width={198}
+          height={258}
+          alt="K Raheja Corp"
+        />
         <div className={styles.meta}>
-          <div className={`${styles.mono} ${styles.metaCorp}`}>
-            K&nbsp;RAHEJA&nbsp;CORP
-          </div>
           <div className={`${styles.mono} ${styles.metaAccess}`}>
             SECURE&nbsp;ACCESS&nbsp;·&nbsp;2026
           </div>
@@ -184,8 +187,21 @@ export default function LoginPage() {
                 </p>
               )}
 
-              <button type="submit" className={`${styles.mono} ${styles.submit}`}>
-                SIGN&nbsp;IN&nbsp;<span className={styles.arrow}>↗</span>
+              <button
+                type="submit"
+                className={`${styles.mono} ${styles.submit}`}
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <span className={styles.spinner} aria-hidden="true" />
+                    SIGNING&nbsp;IN…
+                  </>
+                ) : (
+                  <>
+                    SIGN&nbsp;IN&nbsp;<span className={styles.arrow}>↗</span>
+                  </>
+                )}
               </button>
             </form>
           </section>
