@@ -150,3 +150,19 @@
     margin-bottom: 10px;
   }
 }
+
+/* Short viewport (e.g. Chrome bookmarks bar showing): trim the header top. */
+@media (max-height: 780px) {
+  .header {
+    padding-top: 20px;
+  }
+
+  .brandLogo {
+    height: 44px;
+    margin-bottom: 8px;
+  }
+
+  .title {
+    font-size: clamp(24px, 3.2vw, 36px);
+  }
+}
