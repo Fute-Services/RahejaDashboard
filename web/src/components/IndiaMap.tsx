@@ -57,8 +57,12 @@ type BasemapId = (typeof BASEMAPS)[number]["id"];
 /** What a fresh visit opens on, before the user has picked anything. */
 const DEFAULT_BASEMAP: BasemapId = "satellite";
 
-/** Remembers the chosen base layer across reloads. */
-const BASEMAP_STORAGE_KEY = "kraheja_basemap";
+/**
+ * Remembers the chosen base layer across reloads. The `-v2` suffix drops any
+ * stale preference saved before satellite became the default, so a fresh visit
+ * reliably opens on satellite.
+ */
+const BASEMAP_STORAGE_KEY = "kraheja_basemap_v2";
 
 function initialBasemap(): BasemapId {
   if (typeof window === "undefined") return DEFAULT_BASEMAP;
