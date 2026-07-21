@@ -3,13 +3,17 @@
  * site's oklch tokens: the design leans warmer (paper #f4f1ea, sage accents)
  * than the showcase page, so matching it pixel-for-pixel means hardcoding.
  */
+/* Warm paper + dot grid, with a soft blue glow bleeding from the top-left. */
 .page {
   min-height: 100vh;
   min-height: 100dvh;
   width: 100%;
   background-color: #f4f1ea;
-  background-image: radial-gradient(#d9d4c6 1px, transparent 1px);
-  background-size: 22px 22px;
+  background-image:
+    radial-gradient(#d9d4c6 1px, transparent 1px),
+    radial-gradient(58% 54% at 0% 0%, rgba(75, 99, 214, 0.22), transparent 62%);
+  background-size: 22px 22px, 100% 100%;
+  background-repeat: repeat, no-repeat;
   display: flex;
   flex-direction: column;
   color: #1a1a17;
