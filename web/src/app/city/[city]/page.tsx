@@ -23,7 +23,7 @@ export default async function CityPage({
   return (
     <PropertyCarousel
       properties={list}
-      backHref="/"
+      backHref="/map"
       cityLabel={cityInfo.name}
     />
   );

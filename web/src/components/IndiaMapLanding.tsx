@@ -2,6 +2,7 @@
 
 import { useCallback } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AUTH_COOKIE, LOGIN_PATH } from "@/lib/auth";
 import { citiesWithProjects, properties } from "@/data/properties";
@@ -40,15 +41,18 @@ export function IndiaMapLanding() {
 
       <header className={styles.header}>
         <div>
-          {/* eslint-disable-next-line @next/next/no-img-element -- bundled logo asset; matches the carousel header. */}
-          <img
-            className={styles.brandLogo}
-            src="/brand/k-raheja-corp.png"
-            width={198}
-            height={258}
-            alt="K Raheja Corp"
-          />
-          <h1 className={styles.title}>KRAHEJA</h1>
+          {/* The brand block doubles as the way back to the landing screen. */}
+          <Link className={styles.home} href="/">
+            {/* eslint-disable-next-line @next/next/no-img-element -- bundled logo asset; matches the carousel header. */}
+            <img
+              className={styles.brandLogo}
+              src="/brand/k-raheja-corp.png"
+              width={198}
+              height={258}
+              alt="K Raheja Corp"
+            />
+            <h1 className={styles.title}>KRAHEJA</h1>
+          </Link>
           <p className={styles.subtitle}>
             Pick a city on the map to see its projects
           </p>

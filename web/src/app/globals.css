@@ -25,6 +25,22 @@ body {
   overflow-x: hidden;
 }
 
+/*
+ * No visible scrollbars anywhere in the app — every screen is designed to sit
+ * inside one viewport, and a track down the edge breaks that. Scrolling itself
+ * still works (keyboard, wheel, touch) for the rare screen that needs it.
+ */
+html {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
 a {
   color: var(--link);
   text-decoration: none;
@@ -36,6 +52,21 @@ a:hover {
 
 button {
   font-family: inherit;
+}
+
+/*
+ * One focus ring for the whole app, only for keyboard users. Without this each
+ * screen falls back to the browser's default outline, which changes shape from
+ * control to control.
+ */
+:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+::selection {
+  background: oklch(0.55 0.12 255 / 0.22);
 }
 
 /*

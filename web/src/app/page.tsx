@@ -1,5 +1,5 @@
-import { IndiaMapLanding } from "@/components/IndiaMapLanding";
+import { IntroLanding } from "@/components/IntroLanding";
 
 export default function Home() {
-  return <IndiaMapLanding />;
+  return <IntroLanding />;
 }

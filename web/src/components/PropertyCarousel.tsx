@@ -47,7 +47,7 @@ export function PropertyCarousel({
   cityLabel,
 }: {
   properties: Property[];
-  /** When set, shows a "back" button that navigates here (e.g. "/" for the map). */
+  /** When set, shows a "back" button that navigates here (e.g. "/map"). */
   backHref?: string;
   /** When set, names the city this list is filtered to, shown under the title. */
   cityLabel?: string;

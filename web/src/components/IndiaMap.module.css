@@ -27,100 +27,178 @@
 /* ---------- city pins ---------- */
 
 /*
- * The icon box is 0×0 at the coordinate (see IndiaMap.tsx). The pill re-centres
- * itself so its dot lands on the exact point regardless of label width.
+ * The icon box is 0×0 at the coordinate (see IndiaMap.tsx). The pin re-centres
+ * itself so its tip lands on the exact point regardless of label width.
  */
 .pinWrap {
   background: none;
   border: none;
 }
 
+/*
+ * A 0×0 anchor sitting exactly on the city. Every part positions itself against
+ * it: the teardrop's tip lands on the point, the shadow pools under that tip,
+ * and the name plate sits beside it.
+ */
 .pin {
   position: absolute;
   left: 0;
   top: 0;
-  transform: translate(-50%, -50%);
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  white-space: nowrap;
-  padding: 6px 13px 6px 8px;
-  background: #fff;
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
-  box-shadow: 0 10px 24px -12px oklch(0.4 0.02 95 / 0.55);
-  font-family: var(--font-grotesk), system-ui, sans-serif;
+  width: 0;
+  height: 0;
   cursor: pointer;
-  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
 }
 
-.pin:hover {
-  transform: translate(-50%, calc(-50% - 3px));
-  border-color: var(--ink);
-  box-shadow: 0 16px 30px -12px oklch(0.4 0.02 95 / 0.7);
-}
-
-/* Accent dot with a soft pulsing halo — the "you are here" beat. */
-.pinDot {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--link);
-  box-shadow: 0 0 0 3px oklch(0.55 0.12 255 / 0.18);
-  flex: none;
-}
-
-.pinDot::before {
-  content: "";
+/* Drops in from above, one after the next, and settles with a small bounce. */
+.pinDrop {
   position: absolute;
-  inset: -3px;
-  border-radius: 50%;
-  border: 2px solid var(--link);
-  opacity: 0;
-  animation: pinPulse 2.4s ease-out infinite;
+  left: 0;
+  bottom: 1px;
+  line-height: 0;
+  animation: pinDrop 0.72s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+  animation-delay: calc(0.35s + var(--i) * 0.12s);
 }
 
-@keyframes pinPulse {
-  0% {
-    transform: scale(0.6);
-    opacity: 0.55;
-  }
-  70% {
-    transform: scale(1.9);
-    opacity: 0;
-  }
-  100% {
-    opacity: 0;
-  }
+/*
+ * The hover lift lives on an inner span: the drop animation holds its own
+ * transform on the parent, and the two would otherwise fight.
+ */
+.pinArt {
+  position: relative;
+  display: block;
+  line-height: 0;
+  filter: drop-shadow(0 5px 7px rgba(15, 23, 42, 0.26));
+  transition: transform 0.24s cubic-bezier(0.2, 0.9, 0.3, 1.4);
+}
+
+/* Soft contact shadow on the ground, as in the reference art. */
+.pinShadow {
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 20px;
+  height: 6px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.3);
+  filter: blur(2.5px);
+  transition: transform 0.24s ease, opacity 0.24s ease;
+  animation: shadowIn 0.5s ease both;
+  animation-delay: calc(0.55s + var(--i) * 0.12s);
+}
+
+.pin:hover .pinArt {
+  transform: translateY(-7px) scale(1.06);
+}
+
+.pin:hover .pinShadow {
+  transform: translateX(-50%) scale(0.78);
+  opacity: 0.7;
 }
 
 /* Count badge, shown only when a city holds more than one project. */
 .pinBadge {
   position: absolute;
-  top: -8px;
-  right: -8px;
-  min-width: 17px;
-  height: 17px;
-  padding: 0 4px;
+  top: -5px;
+  right: -7px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
   border-radius: 999px;
   background: var(--ink);
   color: #fff;
   font-family: var(--font-mono), monospace;
   font-size: 10px;
   font-weight: 600;
-  line-height: 17px;
+  line-height: 18px;
   text-align: center;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.35);
 }
 
+/*
+ * Name plate beside the pin. It leans left or right depending on where the pin
+ * sits in the group (see IndiaMap.tsx), so close neighbours never overlap.
+ */
 .pinLabel {
-  font-size: 14px;
+  position: absolute;
+  bottom: 4px;
+  left: 17px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--line);
+  box-shadow: 0 6px 16px -8px rgba(15, 23, 42, 0.5);
+  font-family: var(--font-grotesk), system-ui, sans-serif;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--ink);
+  white-space: nowrap;
+  transition: transform 0.24s ease, box-shadow 0.24s ease;
+  animation: labelIn 0.5s ease both;
+  animation-delay: calc(0.62s + var(--i) * 0.12s);
+}
+
+.pinLabelLeft {
+  left: auto;
+  right: 17px;
+}
+
+.pin:hover .pinLabel {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 22px -8px rgba(15, 23, 42, 0.6);
+}
+
+@keyframes pinDrop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -32px) scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+@keyframes shadowIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+@keyframes labelIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Covers the flight to a city, handing over to that screen's own fade-in. */
+.veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1200;
+  pointer-events: none;
+  background: var(--bg);
+  animation: veilIn 0.76s cubic-bezier(0.5, 0, 0.9, 0.4) both;
+}
+
+@keyframes veilIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* ---------- view switcher (bottom-centre) ---------- */
@@ -139,6 +217,18 @@
   border: 1px solid var(--line-strong);
   border-radius: 999px;
   box-shadow: 0 12px 30px -14px oklch(0.4 0.02 95 / 0.55);
+  animation: switcherIn 0.6s ease 0.5s both;
+}
+
+@keyframes switcherIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 }
 
 .switchBtn {
@@ -152,11 +242,12 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ink-muted);
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .switchBtn:hover {
   color: var(--ink);
+  background: oklch(0.94 0.004 95);
 }
 
 .switchBtn[aria-pressed="true"] {
@@ -165,23 +256,6 @@
 }
 
 /* ---------- Leaflet chrome, restyled minimal ---------- */
-
-.tip:global(.leaflet-tooltip) {
-  background: var(--ink);
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 5px 9px;
-  font-family: var(--font-mono), monospace;
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  box-shadow: 0 8px 20px -10px oklch(0.2 0.02 95 / 0.6);
-}
-
-.tip:global(.leaflet-tooltip-top)::before {
-  border-top-color: var(--ink);
-}
 
 /*
  * Strip Leaflet's default white box around HTML markers. The two-class selector
@@ -195,13 +269,17 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pin,
-  .pin:hover {
-    transition: none;
+  .map,
+  .switcher,
+  .pinDrop,
+  .pinShadow,
+  .pinLabel {
+    animation: none;
   }
 
-  .pinDot::before,
-  .map {
-    animation: none;
+  .pinArt,
+  .pinShadow,
+  .pinLabel {
+    transition: none;
   }
 }

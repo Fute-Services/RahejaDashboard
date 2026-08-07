@@ -222,13 +222,17 @@
     border-color 0.3s ease;
 }
 
-/* No glow at rest — only the focused card lights up red on hover. */
+/*
+ * No glow at rest — the focused card lifts and lights up on hover. The halo is
+ * the site's accent blue rather than a neon red, so it reads as the same family
+ * as the map pins and the sign-in button.
+ */
 .card[data-front="true"]:hover {
-  transform: scale(1.05) translateY(-8px);
+  transform: scale(1.04) translateY(-8px);
   box-shadow:
-    0 0 0 1px rgba(226, 74, 62, 0.65),
-    0 0 70px 10px rgba(226, 74, 62, 0.55),
-    0 0 150px 42px rgba(226, 74, 62, 0.32),
+    0 0 0 1px rgba(43, 82, 212, 0.4),
+    0 0 44px 2px rgba(43, 82, 212, 0.26),
+    0 0 110px 26px rgba(43, 82, 212, 0.16),
     0 34px 62px -30px oklch(0.4 0.02 95 / 0.55);
 }
 

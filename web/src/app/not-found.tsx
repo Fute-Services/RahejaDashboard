@@ -17,7 +17,8 @@ export default function NotFound() {
       <p className={styles.body}>
         That city isn&rsquo;t part of the portfolio yet.
       </p>
-      <Link className={styles.link} href="/">
+      {/* The map moved to /map when the landing screen took over "/". */}
+      <Link className={styles.link} href="/map">
         &larr; Back to the map
       </Link>
     </main>

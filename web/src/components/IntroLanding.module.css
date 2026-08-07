@@ -1,0 +1,594 @@
+/*
+ * Post-login landing. A dark navy world (its own palette, not the site's paper
+ * tokens): the group's story on the left, a twilight tower bleeding in from the
+ * right, sector cards along the bottom, and one way onward — "explore".
+ */
+
+.page {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  background:
+    radial-gradient(
+      70% 60% at 78% 8%,
+      rgba(31, 74, 148, 0.55),
+      transparent 62%
+    ),
+    radial-gradient(
+      55% 55% at 6% 92%,
+      rgba(20, 52, 110, 0.45),
+      transparent 66%
+    ),
+    linear-gradient(155deg, #051531 0%, #041129 46%, #030d20 100%);
+  color: #ffffff;
+  font-family: var(--font-grotesk), system-ui, sans-serif;
+  animation: pageIn 0.6s ease both;
+}
+
+/* Hands over to the map: this screen recedes rather than being cut away. */
+.leaving {
+  animation: pageOut 0.34s cubic-bezier(0.4, 0, 0.85, 0.3) both;
+  pointer-events: none;
+}
+
+/* ---------- backdrop ---------- */
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.waves {
+  position: absolute;
+  top: -6%;
+  left: -6%;
+  width: 112%;
+  height: 112%;
+  color: rgba(255, 255, 255, 0.07);
+  animation: drift 30s ease-in-out infinite alternate;
+}
+
+/* ---------- photograph ---------- */
+
+/*
+ * Bleeds in from the top-right. The box is sized off the photograph's own
+ * aspect ratio (1.465) — width first, height following — so the building is
+ * never cropped: it is always shown whole, flush to the top-right corner. The
+ * `vh` term keeps it from outgrowing a short screen.
+ */
+.photo {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 0;
+  width: min(68%, 88vh * 1.465, 1240px);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.65) 14%,
+    #000 32%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.65) 14%,
+    #000 32%
+  );
+}
+
+/* Height follows the width, so nothing is ever cut off. */
+.photoImg {
+  display: block;
+  width: 100%;
+  height: auto;
+  animation: photoIn 1.4s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+/* Grounds the bottom of the frame into the page so the crop never shows. */
+.photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(3, 13, 32, 0) 80%,
+      rgba(3, 13, 32, 0.5) 93%,
+      rgba(3, 13, 32, 0.96) 100%
+    ),
+    linear-gradient(
+      100deg,
+      rgba(3, 13, 32, 0.38) 0%,
+      rgba(3, 13, 32, 0) 38%
+    );
+}
+
+/* ---------- header ---------- */
+
+.header {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: clamp(14px, 2.6vh, 30px) clamp(24px, 5vw, 72px);
+  animation: rise 0.7s ease both;
+}
+
+/* The logo is blue-on-green artwork: it needs a light chip to read on navy. */
+.brandBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 14px 34px -18px rgba(0, 0, 0, 0.9);
+}
+
+.brandLogo {
+  height: 36px;
+  width: auto;
+  display: block;
+}
+
+.headerMeta {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* ---------- story ---------- */
+
+.main {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: clamp(12px, 2vh, 28px) clamp(24px, 5vw, 72px);
+}
+
+/*
+ * Everything down the left column is sized against height as well as width
+ * (`min(vw, vh)`) so the whole screen — story, stats, button and the card row
+ * below — still lands inside one viewport on a short laptop display.
+ */
+.title {
+  margin: 0;
+  font-family: var(--font-serif), Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(34px, min(5.4vw, 7.6vh), 74px);
+  line-height: 1.04;
+  letter-spacing: 0.015em;
+  text-transform: uppercase;
+  max-width: 12ch;
+  animation: rise 0.9s cubic-bezier(0.22, 0.85, 0.3, 1) 0.12s both;
+}
+
+.lede {
+  margin: clamp(12px, 2vh, 22px) 0 0;
+  max-width: 44ch;
+  font-size: clamp(12.5px, min(0.95vw, 1.9vh), 15px);
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.68);
+  animation: rise 0.9s cubic-bezier(0.22, 0.85, 0.3, 1) 0.2s both;
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: clamp(16px, 3.4vh, 44px);
+}
+
+/* Each figure arrives in turn, and its divider draws itself in behind it. */
+.stat {
+  animation: rise 0.8s cubic-bezier(0.22, 0.85, 0.3, 1) both;
+  animation-delay: calc(0.32s + var(--i) * 0.09s);
+}
+
+.stat + .stat {
+  position: relative;
+  margin-left: clamp(18px, 2.4vw, 34px);
+  padding-left: clamp(18px, 2.4vw, 34px);
+}
+
+.stat + .stat::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 2px;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.24);
+  transform-origin: top;
+  animation: growLine 0.7s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  animation-delay: calc(0.44s + var(--i) * 0.09s);
+}
+
+.statValue {
+  font-family: var(--font-serif), Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(24px, min(2.6vw, 4.4vh), 40px);
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  color: #eef4ff;
+}
+
+.statLabel {
+  margin-top: 6px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* ---------- explore button ---------- */
+
+.explore {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: clamp(18px, 3.6vh, 46px);
+  padding: 8px 10px 8px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #ffffff;
+  text-decoration: none;
+  animation: rise 0.9s cubic-bezier(0.22, 0.85, 0.3, 1) 0.4s both;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+/* Slow halo, so the one action on the screen keeps announcing itself. */
+.explore::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  background: radial-gradient(
+    60% 120% at 70% 50%,
+    rgba(63, 123, 255, 0.45),
+    transparent 70%
+  );
+  opacity: 0.6;
+  z-index: -1;
+  animation: halo 3.4s ease-in-out infinite;
+}
+
+.explore:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.explore:active {
+  transform: translateY(0) scale(0.988);
+  transition-duration: 0.09s;
+}
+
+.explore:focus-visible {
+  outline: 2px solid rgba(140, 180, 255, 0.9);
+  outline-offset: 3px;
+}
+
+.exploreBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(44px, 6.6vh, 52px);
+  height: clamp(44px, 6.6vh, 52px);
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 10px 26px -14px rgba(0, 0, 0, 0.9);
+  flex: none;
+}
+
+.exploreLogo {
+  height: 34px;
+  width: auto;
+  display: block;
+}
+
+.exploreCta {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: clamp(12px, 1.9vh, 15px) clamp(24px, 3vw, 30px);
+  border-radius: 999px;
+  font-size: clamp(15px, 1.9vh, 16px);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  background: linear-gradient(112deg, #1c46c8 0%, #3f7bff 55%, #1c46c8 100%);
+  background-size: 200% 100%;
+  box-shadow: 0 18px 36px -20px rgba(63, 123, 255, 1);
+  transition: background-position 0.6s ease;
+}
+
+.explore:hover .exploreCta {
+  background-position: 100% 0;
+}
+
+/* Light sweeping across the pill on hover. */
+.exploreCta::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -60%;
+  width: 42%;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgba(255, 255, 255, 0.45),
+    transparent
+  );
+  transform: skewX(-18deg);
+  opacity: 0;
+}
+
+.explore:hover .exploreCta::after {
+  animation: sheen 0.9s ease;
+}
+
+.sparkle {
+  animation: twinkle 2.6s ease-in-out infinite;
+}
+
+.explore:hover .sparkle {
+  animation-duration: 1.3s;
+}
+
+/* ---------- sector cards ---------- */
+
+.sectors {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: clamp(10px, 1.1vw, 18px);
+  padding: 0 clamp(24px, 5vw, 72px) clamp(18px, 3vh, 44px);
+}
+
+.sector {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+  padding: clamp(11px, min(1.2vw, 1.9vh), 19px);
+  background: rgba(255, 255, 255, 0.045);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  /* Each card follows the one before it in, left to right. */
+  animation: rise 0.8s cubic-bezier(0.22, 0.85, 0.3, 1) both;
+  animation-delay: calc(0.5s + var(--i) * 0.09s);
+  transition:
+    transform 0.28s ease,
+    background 0.28s ease,
+    border-color 0.28s ease,
+    box-shadow 0.28s ease;
+}
+
+.sector:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(140, 180, 255, 0.5);
+  box-shadow: 0 26px 46px -30px rgba(0, 0, 0, 0.95);
+}
+
+.sectorName {
+  margin: 0 0 clamp(6px, 1.2vh, 10px);
+  font-size: clamp(13.5px, min(1.1vw, 2.2vh), 17px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.sectorLines {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(4px, 0.9vh, 7px);
+  font-size: clamp(10px, min(0.78vw, 1.55vh), 12px);
+  line-height: 1.42;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+/* ---------- keyframes ---------- */
+
+@keyframes pageIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pageOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.025);
+  }
+}
+
+@keyframes growLine {
+  from {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* No scale here: the photograph must stay whole, so it only slides and fades. */
+@keyframes photoIn {
+  from {
+    opacity: 0;
+    transform: translateX(3%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translate3d(-1.5%, 0, 0);
+  }
+  to {
+    transform: translate3d(1.5%, -1.5%, 0);
+  }
+}
+
+@keyframes halo {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.03);
+  }
+}
+
+@keyframes sheen {
+  from {
+    left: -60%;
+    opacity: 1;
+  }
+  to {
+    left: 120%;
+    opacity: 0;
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.75;
+    transform: scale(0.92) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1) rotate(12deg);
+  }
+}
+
+/* ---------- responsive ---------- */
+
+/* Tablet: three cards across, so they wrap onto a second row. */
+@media (max-width: 1100px) {
+  .sectors {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .photo {
+    width: min(76%, 84vh * 1.465);
+    opacity: 0.78;
+  }
+}
+
+@media (max-width: 780px) {
+  .sectors {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .photo {
+    width: 100%;
+    opacity: 0.5;
+  }
+
+  .title {
+    max-width: none;
+  }
+
+  .stats {
+    gap: 16px 0;
+  }
+
+  .explore {
+    margin-top: 26px;
+  }
+}
+
+@media (max-width: 520px) {
+  .header {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .main,
+  .sectors {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .sectors {
+    grid-template-columns: 1fr;
+  }
+
+  .exploreCta {
+    padding: 14px 24px;
+    font-size: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page,
+  .leaving,
+  .waves,
+  .photoImg,
+  .header,
+  .title,
+  .lede,
+  .stat,
+  .stat + .stat::before,
+  .explore,
+  .explore::before,
+  .sparkle,
+  .sector {
+    animation: none;
+  }
+
+  .explore,
+  .sector,
+  .exploreCta {
+    transition: none;
+  }
+}
