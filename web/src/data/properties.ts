@@ -52,7 +52,7 @@ export const properties: Property[] = [
     listName: "Kraheja Cignus",
     location: "Powai, Mumbai",
     city: "mumbai",
-    href: "https://project-cignus.vercel.app/",
+    href: "https://cignus.futeservices.in/",
     image: "/properties/cignus.jpg",
   },
   {
