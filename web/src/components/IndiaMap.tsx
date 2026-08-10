@@ -13,9 +13,9 @@ import styles from "./IndiaMap.module.css";
  * the data, so pins are never hand-placed); clicking a pin opens that city's
  * filtered carousel at `/city/[id]`.
  *
- * The default view is a real, pale basemap — place names, coastlines and roads
- * all present but dialled right down, so the colour-coded pins are the only
- * saturated thing on screen. Satellite and street views are a click away.
+ * The view is a real, pale basemap — place names, coastlines and roads all
+ * present but dialled right down, so the colour-coded pins are the only
+ * saturated thing on screen.
  *
  * Leaflet touches `window`, so this whole component is loaded client-only via
  * `next/dynamic({ ssr: false })` from {@link IndiaMapLanding}.
@@ -31,8 +31,9 @@ const INDIA_BOUNDS: [[number, number], [number, number]] = [
 const MAX_ZOOM = 17;
 
 /**
- * Base layers the switcher offers — all free, no API key. Order sets the toggle
- * order; the first is the default.
+ * The base layers this map can be drawn on — all free, no API key. Only
+ * {@link DEFAULT_BASEMAP} is rendered; the others are kept as the documented
+ * alternatives, so changing the map's look is a one-word edit below.
  */
 const BASEMAPS = [
   {
@@ -55,22 +56,11 @@ const BASEMAPS = [
 
 type BasemapId = (typeof BASEMAPS)[number]["id"];
 
-/** What a fresh visit opens on, before the user has picked anything. */
+/** The layer the map is drawn on. */
 const DEFAULT_BASEMAP: BasemapId = "map";
 
-/**
- * Remembers the chosen base layer across reloads. The suffix is bumped whenever
- * the default changes, so a stale saved preference can't override the new look.
- */
-const BASEMAP_STORAGE_KEY = "kraheja_basemap_v5";
-
-function initialBasemap(): BasemapId {
-  if (typeof window === "undefined") return DEFAULT_BASEMAP;
-  const saved = window.localStorage.getItem(BASEMAP_STORAGE_KEY);
-  return BASEMAPS.some((b) => b.id === saved)
-    ? (saved as BasemapId)
-    : DEFAULT_BASEMAP;
-}
+const BASEMAP =
+  BASEMAPS.find((b) => b.id === DEFAULT_BASEMAP) ?? BASEMAPS[0];
 
 /**
  * Pin colours, cycled by city order — the map reads as a set of distinct places
@@ -154,7 +144,6 @@ function MapHandle({ onMap }: { onMap: (map: L.Map) => void }) {
 export default function IndiaMap() {
   const router = useRouter();
   const entries = citiesWithProjects();
-  const [basemapId, setBasemapId] = useState<BasemapId>(initialBasemap);
   const [leaving, setLeaving] = useState(false);
   const mapRef = useRef<L.Map | null>(null);
 
@@ -188,20 +177,10 @@ export default function IndiaMap() {
    * dark satellite imagery.
    */
   useEffect(() => {
-    document.documentElement.dataset.mapView = basemapId;
+    document.documentElement.dataset.mapView = BASEMAP.id;
     return () => {
       delete document.documentElement.dataset.mapView;
     };
-  }, [basemapId]);
-
-  /** Switches the base layer and remembers it for next time. */
-  const chooseBasemap = useCallback((id: BasemapId) => {
-    setBasemapId(id);
-    try {
-      window.localStorage.setItem(BASEMAP_STORAGE_KEY, id);
-    } catch {
-      // Private mode / storage disabled — the choice just won't persist.
-    }
   }, []);
 
   // Labels lean away from the middle of the group, so neighbouring pins don't
@@ -226,18 +205,7 @@ export default function IndiaMap() {
       >
         <MapHandle onMap={holdMap} />
 
-        {/*
-          All base layers stay mounted; switching only changes their opacity,
-          so the map crossfades gently instead of snapping to the new tiles.
-        */}
-        {BASEMAPS.map((b) => (
-          <TileLayer
-            key={b.id}
-            url={b.url}
-            opacity={b.id === basemapId ? 1 : 0}
-            zIndex={b.id === basemapId ? 2 : 1}
-          />
-        ))}
+        <TileLayer url={BASEMAP.url} />
 
         {entries.map(({ city, projects }, i) => (
           <Marker
@@ -261,21 +229,6 @@ export default function IndiaMap() {
 
       {/* Fades up during the flight, so the city screen arrives out of navy. */}
       {leaving && <div className={styles.veil} aria-hidden="true" />}
-
-      {/* Google-Maps-style base-layer switcher, bottom-centre. */}
-      <div className={styles.switcher} role="group" aria-label="Map view">
-        {BASEMAPS.map((b) => (
-          <button
-            key={b.id}
-            type="button"
-            className={styles.switchBtn}
-            aria-pressed={b.id === basemapId}
-            onClick={() => chooseBasemap(b.id)}
-          >
-            {b.label}
-          </button>
-        ))}
-      </div>
     </div>
   );
 }

@@ -134,11 +134,7 @@ button {
   border-color: var(--line);
 }
 
-/*
- * Crossfade base layers instead of snapping: when a layer's opacity toggles
- * between views, its tiles ease rather than cut. Also softens each tile's
- * first paint.
- */
+/* Softens each tile's first paint, so the map fills in rather than snapping. */
 .leaflet-container .leaflet-tile {
   transition: opacity 0.45s ease;
 }
