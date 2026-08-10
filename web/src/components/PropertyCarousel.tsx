@@ -16,7 +16,16 @@ import styles from "./PropertyCarousel.module.css";
 const SPACING = 430; // px along X per card of offset
 const DEPTH = 200; // px pushed back per card of offset
 const TILT = 42; // deg turned away per card of offset
-const DESIGN_WIDTH = 2 * SPACING + 440; // centre card + a neighbour either side
+
+/**
+ * Card size on the arc — and the roomier size a lone card gets to itself. A
+ * city with one project has no arc to spread out into, so at the arc's size it
+ * read as a small tile stranded in an empty screen; given the whole stage, it
+ * reads as the subject of the page. The pair is the single source of truth:
+ * the CSS takes these as custom properties (`--face-w`/`--face-h`).
+ */
+const FACE = { w: 440, h: 340 };
+const SOLO_FACE = { w: 700, h: 505 };
 const AUTO_SPEED = 0.0031; // cards per frame — retained for the (now idle) drift loop
 /**
  * px of travel before a press counts as a drag rather than a click. Generous
@@ -54,6 +63,13 @@ export function PropertyCarousel({
 }) {
   const count = properties.length;
   const router = useRouter();
+
+  /** One project: no arc, no controls — the card takes the stage on its own. */
+  const solo = count < 2;
+  const face = solo ? SOLO_FACE : FACE;
+  // What the stage has to fit: the lone card, or the centre card plus a
+  // neighbour either side. The scaler shrinks everything to match.
+  const designWidth = solo ? face.w + 120 : 2 * SPACING + face.w;
 
   /** Clears the session cookie; the middleware then bounces us to the login. */
   const signOut = useCallback(() => {
@@ -158,20 +174,31 @@ export function PropertyCarousel({
     [count, snapTo],
   );
 
-  // Scale the whole stage down on narrow viewports so the prism never crops.
+  /*
+   * Scale the whole stage down so the cards never crop — against the stage's
+   * height as well as its width. Width alone was not enough: on a short window
+   * (a laptop with the bookmarks bar showing) there is plenty of room sideways
+   * and none vertically, and the card ran out under the header and footer.
+   */
   useEffect(() => {
     const fit = () => {
       const stage = stageRef.current;
       const scaler = scalerRef.current;
       if (!stage || !scaler) return;
-      const available = Math.min(stage.clientWidth, window.innerWidth * 0.94);
-      scaler.style.transform = `scale(${Math.min(1, available / DESIGN_WIDTH)})`;
+      const availableW = Math.min(stage.clientWidth, window.innerWidth * 0.94);
+      // The margin leaves the focused card room to lift on hover.
+      const availableH = stage.clientHeight - 40;
+      scaler.style.transform = `scale(${Math.min(
+        1,
+        availableW / designWidth,
+        availableH / face.h,
+      )})`;
     };
 
     fit();
     window.addEventListener("resize", fit);
     return () => window.removeEventListener("resize", fit);
-  }, []);
+  }, [designWidth, face.h]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -293,18 +320,40 @@ export function PropertyCarousel({
 
   return (
     <div className={styles.page}>
-      <div className={styles.dots} />
+      <div className={styles.backdrop} aria-hidden="true">
+        {/* Same drifting contour lines as the landing screen. */}
+        <svg
+          className={styles.waves}
+          viewBox="0 0 1440 900"
+          preserveAspectRatio="none"
+        >
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <path
+              key={i}
+              d={`M-100 ${140 + i * 130} C 240 ${60 + i * 130}, 620 ${
+                300 + i * 130
+              }, 1540 ${120 + i * 130}`}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1"
+            />
+          ))}
+        </svg>
+      </div>
 
       <header className={styles.header}>
         <div>
-          {/* eslint-disable-next-line @next/next/no-img-element -- raw <img> to match ImageSlot; the logo is a bundled asset, so no optimisation is needed */}
-          <img
-            className={styles.brandLogo}
-            src="/brand/k-raheja-corp.png"
-            width={198}
-            height={258}
-            alt="K Raheja Corp"
-          />
+          {/* The logo is blue-on-green artwork: it needs a light chip on navy. */}
+          <span className={styles.brandBadge}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- raw <img> to match ImageSlot; the logo is a bundled asset, so no optimisation is needed */}
+            <img
+              className={styles.brandLogo}
+              src="/brand/k-raheja-corp.png"
+              width={198}
+              height={258}
+              alt="K Raheja Corp"
+            />
+          </span>
           <h1 className={styles.title}>KRAHEJA</h1>
           {cityLabel && (
             <p className={styles.cityLabel}>
@@ -315,9 +364,12 @@ export function PropertyCarousel({
         <div className={styles.meta}>
           <div className={styles.counter}>
             <span>{pad2(index + 1)}</span>
-            <span className={styles.counterTotal}>
-              &nbsp;/&nbsp;{pad2(count)}
-            </span>
+            {/* "01 / 01" beside a city label that already reads "1 project". */}
+            {!solo && (
+              <span className={styles.counterTotal}>
+                &nbsp;/&nbsp;{pad2(count)}
+              </span>
+            )}
           </div>
           <div className={styles.tagline}>Kraheja Portfolio &middot; 2026</div>
         </div>
@@ -326,6 +378,13 @@ export function PropertyCarousel({
       <div
         ref={stageRef}
         className={styles.stage}
+        data-single={solo}
+        // The card size lives in JS (it also drives the fit above); the CSS
+        // reads it from here so the two can never disagree.
+        style={{
+          ["--face-w" as string]: `${face.w}px`,
+          ["--face-h" as string]: `${face.h}px`,
+        }}
         onPointerDown={onPointerDown}
         onClickCapture={onClickCapture}
         onDragStart={onDragStart}
@@ -351,8 +410,14 @@ export function PropertyCarousel({
                     </div>
                     <div className={styles.cardFoot}>
                       <div className={styles.cardLabel}>
-                        <span className={styles.cardIndex}>{pad2(i + 1)}</span>
-                        <h3 className={styles.cardName}>{property.name}</h3>
+                        {/* Numbering a set of one says nothing. */}
+                        {!solo && (
+                          <span className={styles.cardIndex}>{pad2(i + 1)}</span>
+                        )}
+                        <div className={styles.cardText}>
+                          <h3 className={styles.cardName}>{property.name}</h3>
+                          <p className={styles.cardPlace}>{property.location}</p>
+                        </div>
                       </div>
                       <a
                         className={styles.cardLink}
@@ -371,42 +436,54 @@ export function PropertyCarousel({
         </div>
       </div>
 
-      <footer className={styles.footer}>
-        <div className={styles.controls}>
-          <div className={styles.buttons}>
-            <button
-              type="button"
-              className={styles.navButton}
-              aria-label="Previous property"
-              onClick={() => nudge(-1)}
-            >
-              &#8592;
-            </button>
-            <button
-              type="button"
-              className={styles.navButton}
-              aria-label="Next property"
-              onClick={() => nudge(1)}
-            >
-              &#8594;
-            </button>
-          </div>
-          <span className={styles.hint}>Drag to rotate &middot; or pick below</span>
-        </div>
-        <nav className={styles.list}>
-          {properties.map((property, i) => (
-            <button
-              key={property.slug}
-              type="button"
-              className={styles.listItem}
-              aria-current={i === index}
-              onClick={() => goTo(i)}
-            >
-              <span className={styles.listIndex}>{pad2(i + 1)}</span>
-              {property.listName ?? property.name}
-            </button>
-          ))}
-        </nav>
+      {/*
+       * The footer element stays even when there is nothing to put in it: its
+       * bottom padding is what keeps the stage clear of the fixed map/logout
+       * buttons. With one project there is nothing to navigate between, so the
+       * arrows, the drag hint and the picker all drop away.
+       */}
+      <footer className={styles.footer} data-empty={solo}>
+        {!solo && (
+          <>
+            <div className={styles.controls}>
+              <div className={styles.buttons}>
+                <button
+                  type="button"
+                  className={styles.navButton}
+                  aria-label="Previous property"
+                  onClick={() => nudge(-1)}
+                >
+                  &#8592;
+                </button>
+                <button
+                  type="button"
+                  className={styles.navButton}
+                  aria-label="Next property"
+                  onClick={() => nudge(1)}
+                >
+                  &#8594;
+                </button>
+              </div>
+              <span className={styles.hint}>
+                Drag to rotate &middot; or pick below
+              </span>
+            </div>
+            <nav className={styles.list}>
+              {properties.map((property, i) => (
+                <button
+                  key={property.slug}
+                  type="button"
+                  className={styles.listItem}
+                  aria-current={i === index}
+                  onClick={() => goTo(i)}
+                >
+                  <span className={styles.listIndex}>{pad2(i + 1)}</span>
+                  {property.listName ?? property.name}
+                </button>
+              ))}
+            </nav>
+          </>
+        )}
       </footer>
 
       {backHref && (

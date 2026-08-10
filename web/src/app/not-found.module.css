@@ -1,8 +1,13 @@
+/*
+ * Reached from the map and the showcase, so it lives in the same navy world
+ * rather than dropping the visitor onto a white page.
+ */
 .page {
+  position: relative;
   height: 100vh;
   height: 100dvh;
-  background: var(--bg);
-  color: var(--ink);
+  background: var(--brand-bg);
+  color: var(--on-navy);
   font-family: var(--font-grotesk), system-ui, sans-serif;
   display: flex;
   flex-direction: column;
@@ -11,13 +16,34 @@
   gap: 14px;
   text-align: center;
   padding: 24px;
+  animation: fadeIn 0.4s ease both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* The logo is blue-on-green artwork: it needs a light chip to read on navy. */
+.brandBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 13px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 14px 34px -18px rgba(0, 0, 0, 0.9);
+  margin-bottom: 20px;
 }
 
 .brandLogo {
-  height: 50px;
+  height: 38px;
   width: auto;
   display: block;
-  margin-bottom: 18px;
 }
 
 .title {
@@ -29,14 +55,43 @@
 
 .body {
   margin: 0;
-  color: var(--ink-muted);
+  color: var(--on-navy-muted);
   font-size: 15px;
 }
 
+/* Glass pill, matching the showcase's "← Map". */
 .link {
-  margin-top: 10px;
+  margin-top: 12px;
   font-family: var(--font-mono), monospace;
-  font-size: 12px;
-  letter-spacing: 0.1em;
+  font-size: 11px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
+  color: var(--on-navy);
+  background: var(--glass);
+  border: 1px solid var(--glass-line);
+  border-radius: 999px;
+  padding: 11px 20px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.link:hover {
+  color: var(--on-navy);
+  background: var(--glass-lift);
+  border-color: var(--glass-line-lift);
+  transform: translateY(-1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page {
+    animation: none;
+  }
+
+  .link {
+    transition: none;
+  }
 }

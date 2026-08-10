@@ -1,8 +1,8 @@
 /*
  * Login screen: the twilight photograph of the tower shown whole behind a plain
- * white sign-in card on the right. Colours are hardcoded hex rather than the
- * site's oklch tokens — this screen is its own dark world and doesn't inherit
- * the paper-white palette of the rest of the site.
+ * white sign-in card on the right. The navy ground and the accent blue come
+ * from the shared tokens in globals.css; the card is deliberately its own light
+ * surface — the one lit panel in a dark screen, where the eye should land.
  */
 
 .page {
@@ -16,7 +16,7 @@
   overflow-x: hidden;
   overflow-y: auto;
   background: #060c1a;
-  color: #ffffff;
+  color: var(--on-navy);
   font-family: var(--font-grotesk), system-ui, sans-serif;
 }
 
@@ -74,10 +74,15 @@
       transparent 62%,
       rgba(3, 8, 18, 0.42) 100%
     ),
+    /*
+     * The pool of shade the headline column sits in. It reaches far enough
+     * right to cover the lede and the figures under it — the facade behind
+     * them is the brightest part of the frame.
+     */
     radial-gradient(
-      58% 62% at 12% 58%,
-      rgba(3, 8, 18, 0.86),
-      transparent 74%
+      64% 72% at 10% 56%,
+      rgba(3, 8, 18, 0.9),
+      transparent 78%
     ),
     linear-gradient(
       100deg,
@@ -138,7 +143,7 @@
   z-index: 2;
   flex: 1;
   display: grid;
-  grid-template-columns: 1fr minmax(340px, 400px);
+  grid-template-columns: 1fr minmax(350px, 412px);
   align-items: center;
   gap: clamp(28px, 5vw, 72px);
   padding: 8px clamp(20px, 4vw, 48px) clamp(24px, 4vh, 48px);
@@ -158,13 +163,36 @@
 }
 
 .intro > *:nth-child(1) {
-  animation-delay: 0.1s;
+  animation-delay: 0.06s;
 }
 .intro > *:nth-child(2) {
-  animation-delay: 0.2s;
+  animation-delay: 0.14s;
 }
 .intro > *:nth-child(3) {
+  animation-delay: 0.22s;
+}
+.intro > *:nth-child(4) {
   animation-delay: 0.3s;
+}
+
+/* A live dot ahead of the greeting — the screen's only piece of small motion. */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: clamp(12px, 2vh, 18px);
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.eyebrowDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 0 rgba(63, 123, 255, 0.55);
+  animation: pulse 2.6s ease-out infinite;
 }
 
 .title {
@@ -194,11 +222,11 @@
 }
 
 .introFoot {
-  margin-top: clamp(24px, 5vh, 52px);
+  margin-top: clamp(20px, 4.4vh, 46px);
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  max-width: 380px;
+  gap: clamp(14px, 2.2vh, 20px);
+  max-width: 400px;
 }
 
 .rule {
@@ -210,19 +238,50 @@
   );
 }
 
-.tagline {
-  font-size: 10px;
-  letter-spacing: 0.26em;
-  color: rgba(255, 255, 255, 0.55);
+/* The landing screen's three figures, carried across the sign-in. */
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.stat + .stat {
+  position: relative;
+  margin-left: clamp(16px, 2.2vw, 28px);
+  padding-left: clamp(16px, 2.2vw, 28px);
+}
+
+.stat + .stat::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 3px;
+  bottom: 3px;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.statValue {
+  font-size: clamp(16px, 2.2vh, 20px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #eef4ff;
+}
+
+.statLabel {
+  margin-top: 5px;
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 /* ---------- sign-in card ---------- */
 
 .card {
   position: relative;
-  padding: clamp(26px, 3.4vh, 36px) clamp(24px, 2.4vw, 34px)
+  padding: clamp(26px, 3.4vh, 38px) clamp(24px, 2.4vw, 34px)
     clamp(20px, 2.6vh, 26px);
-  border-radius: 18px;
+  border-radius: 20px;
   background: #ffffff;
   color: #16233d;
   box-shadow:
@@ -282,14 +341,39 @@
   color: #3f4b66;
 }
 
+/* Holds the leading icon (and, on the password field, the eye toggle). */
+.inputWrap {
+  position: relative;
+  display: flex;
+}
+
+/* Sits inside the field's left padding; lights up with the field on focus. */
+.leadIcon {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
+  display: flex;
+  color: #a3abbd;
+  pointer-events: none;
+  transition: color 0.18s ease;
+}
+
+.inputWrap:focus-within .leadIcon {
+  color: var(--accent-deep);
+}
+
 .input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
   font-family: var(--font-grotesk), system-ui, sans-serif;
   font-size: 15px;
   color: #16233d;
-  padding: 13px 14px;
+  padding: 13px 14px 13px 42px;
   background: #f6f7fb;
   border: 1px solid #dfe3ec;
-  border-radius: 10px;
+  border-radius: 11px;
   transition:
     border-color 0.18s ease,
     background 0.18s ease,
@@ -300,25 +384,56 @@
   color: #a3abbd;
 }
 
-.input:hover {
+/*
+ * Chrome paints its own pale-blue wash over an autofilled field, which lands
+ * nothing like the rest of the card. The background can't be set directly on an
+ * autofilled input — an inset shadow the size of the field is the way to cover
+ * it — and the long transition keeps Chrome from fading its colour back in.
+ */
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #16233d;
+  -webkit-box-shadow: 0 0 0 1000px #f6f7fb inset;
+  caret-color: #16233d;
+  transition: background-color 9999s ease-out;
+}
+
+.input:-webkit-autofill:focus {
+  -webkit-box-shadow:
+    0 0 0 1000px #ffffff inset,
+    0 0 0 4px rgba(43, 82, 212, 0.14);
+}
+
+.input:hover:not(:disabled) {
   border-color: #c9cfdd;
 }
 
 .input:focus {
   outline: none;
   background: #ffffff;
-  border-color: #2b52d4;
+  border-color: var(--accent-deep);
   box-shadow: 0 0 0 4px rgba(43, 82, 212, 0.14);
 }
 
-.inputWrap {
-  position: relative;
-  display: flex;
+/* A rejected pair marks both fields, so it's clear what to fix. */
+.input[aria-invalid="true"] {
+  border-color: #e2a29d;
+  background: #fdf5f4;
+}
+
+.input[aria-invalid="true"]:focus {
+  border-color: #b3261e;
+  box-shadow: 0 0 0 4px rgba(179, 38, 30, 0.12);
+}
+
+.input:disabled {
+  color: #8b93a6;
+  cursor: not-allowed;
 }
 
 /* Leave room so typed text never slides under the eye button. */
 .inputPassword {
-  flex: 1;
   padding-right: 46px;
 }
 
@@ -337,16 +452,40 @@
   border-radius: 8px;
   color: #99a2b6;
   cursor: pointer;
-  transition: color 0.18s ease;
+  transition:
+    color 0.18s ease,
+    background 0.18s ease;
 }
 
 .eye:hover {
-  color: #2b52d4;
+  color: var(--accent-deep);
+  background: #eef1f9;
 }
 
 .eye:focus-visible {
-  outline: 2px solid #2b52d4;
+  outline: 2px solid var(--accent-deep);
   outline-offset: 1px;
+}
+
+/* Caps Lock breaks a password nobody can read back — say so before submit. */
+.caps {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #9a6b12;
+  animation: rise 0.24s ease both;
+}
+
+.caps::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #d9a441;
 }
 
 /* ---------- remember / help row ---------- */
@@ -372,7 +511,7 @@
 .checkbox {
   width: 15px;
   height: 15px;
-  accent-color: #2b52d4;
+  accent-color: var(--accent-deep);
   cursor: pointer;
 }
 
@@ -382,7 +521,7 @@
   border: none;
   font-family: inherit;
   font-size: 13px;
-  color: #2b52d4;
+  color: var(--accent-deep);
   cursor: pointer;
 }
 
@@ -394,7 +533,7 @@
   margin: 0;
   padding: 10px 12px;
   border-radius: 8px;
-  border-left: 2px solid #2b52d4;
+  border-left: 2px solid var(--accent-deep);
   background: #f1f4fc;
   font-size: 12.5px;
   line-height: 1.5;
@@ -403,11 +542,25 @@
 }
 
 .error {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
   margin: 0;
+  padding: 11px 13px;
+  border-radius: 10px;
+  border: 1px solid #f2d2cf;
+  background: #fdf3f2;
   font-size: 13px;
-  line-height: 1.4;
-  color: #b3261e;
+  line-height: 1.45;
+  color: #9d2019;
   animation: shake 0.4s ease both;
+}
+
+.errorIcon {
+  display: flex;
+  flex: none;
+  margin-top: 1px;
+  color: #c1362c;
 }
 
 /* ---------- submit ---------- */
@@ -424,11 +577,11 @@
   font-size: 15px;
   font-weight: 600;
   color: #ffffff;
-  background: linear-gradient(118deg, #1c46c8 0%, #3f7bff 55%, #1c46c8 100%);
+  background: var(--accent-pill);
   background-size: 200% 100%;
   border: none;
   padding: 14px;
-  border-radius: 10px;
+  border-radius: 11px;
   cursor: pointer;
   box-shadow: 0 14px 28px -16px rgba(28, 70, 200, 0.9);
   transition:
@@ -445,6 +598,16 @@
 
 .submit:active:not(:disabled) {
   transform: translateY(0) scale(0.995);
+}
+
+/* The arrow leans forward as the button is hovered. */
+.submitArrow {
+  display: inline-block;
+  transition: transform 0.22s ease;
+}
+
+.submit:hover:not(:disabled) .submitArrow {
+  transform: translateX(3px);
 }
 
 /* Light sweeping across the button on hover. */
@@ -580,6 +743,18 @@
   }
 }
 
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(63, 123, 255, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(63, 123, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(63, 123, 255, 0);
+  }
+}
+
 /* ---------- responsive ---------- */
 
 /* Tablet: the card drops under the headline. */
@@ -616,6 +791,7 @@
     font-size: 9px;
   }
 
+  /* No room for the proof strip beside a full-width card — the form wins. */
   .introFoot {
     display: none;
   }
@@ -631,8 +807,10 @@
   .leaving,
   .header,
   .intro > *,
+  .eyebrowDot,
   .card,
   .fields > *,
+  .caps,
   .help,
   .error,
   .submit:hover::after {
@@ -640,7 +818,9 @@
   }
 
   .submit,
+  .submitArrow,
   .input,
+  .leadIcon,
   .eye {
     transition: none;
   }

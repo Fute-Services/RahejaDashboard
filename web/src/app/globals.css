@@ -1,3 +1,12 @@
+/*
+ * Two worlds, one brand.
+ *
+ * The paper tokens dress the map screen, whose chrome floats over pale tiles.
+ * Everything else — login, landing, showcase, 404 — lives in the navy world
+ * below. Those screens used to each hardcode their own hexes, which is how the
+ * showcase drifted into looking like a different site; they now all read from
+ * these tokens instead.
+ */
 :root {
   --bg: oklch(0.986 0.004 95);
   --ink: oklch(0.2 0.01 95);
@@ -10,17 +19,62 @@
   --slot-bg: oklch(0.955 0.004 95);
   --link: oklch(0.55 0.12 255);
   --link-hover: oklch(0.45 0.14 255);
+
+  /* ---------- navy world ---------- */
+
+  /* The shared ground: two lit corners over a deep navy fall. */
+  --brand-bg:
+    radial-gradient(70% 60% at 78% 8%, rgba(31, 74, 148, 0.55), transparent 62%),
+    radial-gradient(55% 55% at 6% 92%, rgba(20, 52, 110, 0.45), transparent 66%),
+    linear-gradient(155deg, #051531 0%, #041129 46%, #030d20 100%);
+  --navy-deep: #030d20;
+
+  /* Type on navy. */
+  --on-navy: #ffffff;
+  --on-navy-muted: rgba(255, 255, 255, 0.68);
+  --on-navy-dim: rgba(255, 255, 255, 0.5);
+
+  /* Glass: every raised surface in the navy world is one of these. */
+  --glass: rgba(255, 255, 255, 0.05);
+  --glass-lift: rgba(255, 255, 255, 0.09);
+  --glass-line: rgba(255, 255, 255, 0.16);
+  --glass-line-lift: rgba(255, 255, 255, 0.3);
+
+  /* The one accent — sign-in button, explore pill, map pins, focused card. */
+  --accent: #3f7bff;
+  --accent-deep: #1c46c8;
+  --accent-pill: linear-gradient(
+    112deg,
+    #1c46c8 0%,
+    #3f7bff 55%,
+    #1c46c8 100%
+  );
+  --accent-halo: rgba(63, 123, 255, 0.45);
+  --accent-line: rgba(140, 180, 255, 0.5);
+
+  /* Sign-out, the only red in the app. */
+  --danger: #d13b32;
+  --danger-deep: #b32c24;
 }
 
 * {
   box-sizing: border-box;
 }
 
+/*
+ * The ground under every route. Navy, not paper: each screen fades itself out
+ * before handing over (and fades itself in on arrival), and whatever the body
+ * is painted with is what shows through in that gap. Paper white here is what
+ * made every navigation flash white between two dark screens.
+ *
+ * Every screen paints its own background over this — including the map, which
+ * is the one paper-white world in the app — so nothing else has to change.
+ */
 html,
 body {
   margin: 0;
   padding: 0;
-  background: var(--bg);
+  background: var(--navy-deep);
   /* Never let a stray pixel spill sideways into a horizontal scrollbar. */
   overflow-x: hidden;
 }

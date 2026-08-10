@@ -1,16 +1,23 @@
-/* Fixed to the viewport: this is a single-screen showcase, never a scrolling page. */
+/*
+ * The city showcase. It used to be a paper-white screen with a dot grid, which
+ * made it read as a different site from the login and the landing; it now sits
+ * in the same navy world as those, with the arc of cards rendered as glass. The
+ * geometry (the coverflow arc) is unchanged — only the world around it is.
+ *
+ * Fixed to the viewport: this is a single-screen showcase, never a scrolling page.
+ */
 .page {
   height: 100vh;
   height: 100dvh;
-  background: var(--bg);
-  color: var(--ink);
+  background: var(--brand-bg);
+  color: var(--on-navy);
   font-family: var(--font-grotesk), system-ui, sans-serif;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   position: relative;
   /* Eases the filtered view in on navigation so it doesn't snap into place. */
-  animation: screenFadeIn 0.4s ease both;
+  animation: screenFadeIn 0.45s ease both;
 }
 
 @keyframes screenFadeIn {
@@ -22,13 +29,33 @@
   }
 }
 
-.dots {
+/* ---------- backdrop ---------- */
+
+/* The same drifting contour lines as the landing screen, so the two rhyme. */
+.backdrop {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(var(--dot) 1px, transparent 1px);
-  background-size: 26px 26px;
-  opacity: 0.5;
+  z-index: 0;
   pointer-events: none;
+}
+
+.waves {
+  position: absolute;
+  top: -6%;
+  left: -6%;
+  width: 112%;
+  height: 112%;
+  color: rgba(255, 255, 255, 0.06);
+  animation: drift 30s ease-in-out infinite alternate;
+}
+
+@keyframes drift {
+  from {
+    transform: translate3d(-1.5%, 0, 0);
+  }
+  to {
+    transform: translate3d(1.5%, -1.5%, 0);
+  }
 }
 
 /* ---------- header ---------- */
@@ -38,26 +65,46 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 32px 40px 0;
+  padding: clamp(18px, 2.8vh, 30px) clamp(24px, 5vw, 56px) 0;
   flex-wrap: wrap;
   gap: 16px;
   z-index: 2;
+  animation: rise 0.7s cubic-bezier(0.22, 0.85, 0.3, 1) both;
+}
+
+/* The logo is blue-on-green artwork: it needs a light chip to read on navy. */
+.brandBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 14px 34px -18px rgba(0, 0, 0, 0.9);
 }
 
 .brandLogo {
-  height: 54px;
+  height: 36px;
   width: auto;
   display: block;
-  margin-bottom: 14px;
 }
 
 .title {
   margin: 14px 0 0;
-  font-size: clamp(28px, 4vw, 44px);
+  font-size: clamp(26px, 3.4vw, 40px);
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1.02;
-  max-width: 12ch;
+}
+
+/* Names the filtered city, sitting just under the KRAHEJA title. */
+.cityLabel {
+  margin: 8px 0 0;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent-line);
 }
 
 .meta {
@@ -66,37 +113,29 @@
 }
 
 .counter {
-  font-size: clamp(32px, 5vw, 52px);
+  font-size: clamp(30px, 4.4vw, 46px);
   line-height: 1;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
 
 .counterTotal {
-  opacity: 0.35;
+  opacity: 0.4;
   font-size: 0.5em;
   vertical-align: top;
 }
 
 .tagline {
   margin-top: 8px;
-  font-size: 12px;
-  letter-spacing: 0.12em;
+  font-size: 11px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--ink-dim);
+  color: var(--on-navy-dim);
 }
 
-/* Names the filtered city, sitting just under the KRAHEJA title. */
-.cityLabel {
-  margin: 8px 0 0;
-  font-family: var(--font-mono), monospace;
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--link);
-}
+/* ---------- floating chrome ---------- */
 
-/* Back to the map — mirror of the logout button, pinned bottom-left, quiet. */
+/* Back to the map — quiet glass, mirroring the landing's controls. */
 .back {
   position: fixed;
   left: 20px;
@@ -106,21 +145,32 @@
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--ink);
-  background: #fff;
-  border: 1px solid var(--line-strong);
+  color: var(--on-navy);
+  background: var(--glass);
+  border: 1px solid var(--glass-line);
   border-radius: 999px;
   padding: 10px 18px;
   cursor: pointer;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+  animation: chromeIn 0.6s ease 0.4s both;
 }
 
 .back:hover {
-  border-color: var(--ink);
-  box-shadow: 0 8px 20px -10px oklch(0.4 0.02 95 / 0.5);
+  background: var(--glass-lift);
+  border-color: var(--glass-line-lift);
+  transform: translateY(-1px);
 }
 
-/* Floating logout, pinned to the bottom-right — solid accent so it stands out. */
+.back:active {
+  transform: translateY(0) scale(0.985);
+}
+
+/* Floating logout, pinned bottom-right — solid red, matching the map screen. */
 .signout {
   position: fixed;
   right: 20px;
@@ -131,18 +181,38 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #ffffff;
-  background: #d13b32;
+  background: var(--danger);
   border: none;
   border-radius: 999px;
   padding: 10px 18px;
   cursor: pointer;
   box-shadow: 0 6px 18px -6px rgba(209, 59, 50, 0.6);
-  transition: background 0.15s, box-shadow 0.15s;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.25s ease,
+    transform 0.2s ease;
+  animation: chromeIn 0.6s ease 0.45s both;
 }
 
 .signout:hover {
-  background: #b32c24;
-  box-shadow: 0 8px 22px -6px rgba(209, 59, 50, 0.7);
+  background: var(--danger-deep);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px -6px rgba(209, 59, 50, 0.75);
+}
+
+.signout:active {
+  transform: translateY(0) scale(0.985);
+}
+
+@keyframes chromeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ---------- 3D stage ---------- */
@@ -159,6 +229,11 @@
   cursor: grab;
   touch-action: pan-y;
   z-index: 1;
+}
+
+/* Nothing to rotate with a single project: drop the grab affordance. */
+.stage[data-single="true"] {
+  cursor: default;
 }
 
 .stage[data-dragging="true"] {
@@ -194,24 +269,40 @@
     border-color 0.3s ease;
 }
 
+/*
+ * Sized from the custom properties the carousel writes onto the stage — one
+ * card size on the arc, a larger one when a city has a single project. The
+ * negative margins are half of each, so the card stays centred on the origin
+ * whichever size is in play.
+ */
 .face {
   position: absolute;
   top: 0;
   left: 0;
-  width: 440px;
-  height: 340px;
-  margin: -170px 0 0 -220px;
+  width: var(--face-w, 440px);
+  height: var(--face-h, 340px);
+  margin: calc(var(--face-h, 340px) / -2) 0 0 calc(var(--face-w, 440px) / -2);
   transform-style: preserve-3d;
   backface-visibility: hidden;
 }
 
+/*
+ * Glass, not paper. No backdrop-filter here on purpose: the carousel writes a
+ * `filter: blur()` onto off-centre cards for depth, and an element carrying both
+ * blurs its own backdrop sample too — expensive, and visibly wrong at the edges.
+ * A two-stop translucent fill reads the same for a fraction of the cost.
+ */
 .card {
   width: 100%;
   height: 100%;
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  box-shadow: 0 26px 50px -30px oklch(0.4 0.02 95 / 0.5);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.085),
+    rgba(255, 255, 255, 0.04)
+  );
+  border: 1px solid var(--glass-line);
+  border-radius: 18px;
+  box-shadow: 0 36px 64px -38px rgba(0, 0, 0, 0.95);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -223,43 +314,84 @@
 }
 
 /*
- * No glow at rest — the focused card lifts and lights up on hover. The halo is
- * the site's accent blue rather than a neon red, so it reads as the same family
- * as the map pins and the sign-in button.
+ * No glow at rest — the focused card lifts and lights up on hover, in the same
+ * accent blue as the map pins and the sign-in button.
  */
 .card[data-front="true"]:hover {
-  transform: scale(1.04) translateY(-8px);
+  transform: scale(1.035) translateY(-8px);
+  border-color: var(--accent-line);
   box-shadow:
-    0 0 0 1px rgba(43, 82, 212, 0.4),
-    0 0 44px 2px rgba(43, 82, 212, 0.26),
-    0 0 110px 26px rgba(43, 82, 212, 0.16),
-    0 34px 62px -30px oklch(0.4 0.02 95 / 0.55);
+    0 0 44px 2px rgba(63, 123, 255, 0.3),
+    0 0 110px 26px rgba(63, 123, 255, 0.16),
+    0 40px 70px -34px rgba(0, 0, 0, 1);
 }
 
+/*
+ * ImageSlot styles itself from the global paper tokens; re-point them here so an
+ * image-less card falls back to a dark tile instead of a white one.
+ */
 .cardMedia {
   position: relative;
   flex: 1;
   overflow: hidden;
+  --slot-bg: rgba(255, 255, 255, 0.06);
+  --ink-muted: var(--on-navy-dim);
+}
+
+/* Grounds the photo into the card's foot so the seam never reads as a cut. */
+.cardMedia::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(3, 13, 32, 0) 55%,
+    rgba(3, 13, 32, 0.45) 100%
+  );
 }
 
 .cardFoot {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
-  border-top: 1px solid var(--line-soft);
+  gap: 14px;
+  padding: 15px 20px;
+  background: rgba(4, 14, 34, 0.55);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* The lone card is half again as large; its plate grows to match. */
+.stage[data-single="true"] .cardFoot {
+  padding: 19px 26px;
+}
+
+.stage[data-single="true"] .cardName {
+  font-size: 22px;
+}
+
+.stage[data-single="true"] .cardLink {
+  padding: 11px 20px;
+  font-size: 12px;
 }
 
 .cardLabel {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 12px;
+  min-width: 0;
 }
 
 .cardIndex {
   font-family: var(--font-mono), monospace;
   font-size: 12px;
-  color: var(--ink-muted);
+  color: var(--on-navy-dim);
+  flex: none;
+}
+
+/* Name over place, so the card says where it is without a second row. */
+.cardText {
+  min-width: 0;
 }
 
 .cardName {
@@ -267,16 +399,53 @@
   font-size: 18px;
   font-weight: 500;
   letter-spacing: -0.01em;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.cardLink {
+.cardPlace {
+  margin: 4px 0 0;
   font-family: var(--font-mono), monospace;
-  font-size: 12px;
-  letter-spacing: 0.08em;
+  font-size: 10px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  display: flex;
+  color: var(--on-navy-dim);
+}
+
+/* The one action on a card: the accent pill, same family as "explore". */
+.cardLink {
+  flex: none;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-decoration: none;
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: var(--accent-pill);
+  background-size: 200% 100%;
+  box-shadow: 0 12px 26px -16px rgba(63, 123, 255, 1);
+  transition:
+    background-position 0.5s ease,
+    transform 0.2s ease,
+    box-shadow 0.25s ease;
+}
+
+.cardLink:hover {
+  color: #ffffff;
+  background-position: 100% 0;
+  transform: translateY(-1px);
+  box-shadow: 0 16px 30px -16px rgba(63, 123, 255, 1);
+}
+
+.cardLink:active {
+  transform: translateY(0) scale(0.985);
 }
 
 /* ---------- footer ---------- */
@@ -287,11 +456,21 @@
  */
 .footer {
   position: relative;
-  padding: 0 40px 72px;
+  padding: 0 clamp(24px, 5vw, 56px) 72px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
   z-index: 2;
+  animation: rise 0.7s cubic-bezier(0.22, 0.85, 0.3, 1) 0.12s both;
+}
+
+/*
+ * With one project there are no controls to hold, so the footer keeps only the
+ * clearance the fixed map/logout pills need — the stage takes back the rest
+ * instead of leaving a dead band under the card.
+ */
+.footer[data-empty="true"] {
+  padding-bottom: 58px;
 }
 
 /* 3 columns so the buttons sit dead-centre regardless of the hint's width. */
@@ -309,21 +488,33 @@
 }
 
 .navButton {
-  width: 52px;
-  height: 52px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  border: 1px solid var(--line-strong);
-  background: #fff;
+  border: 1px solid var(--glass-line);
+  background: var(--glass);
+  color: var(--on-navy);
   cursor: pointer;
-  font-size: 20px;
+  font-size: 19px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: border-color 0.2s;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .navButton:hover {
-  border-color: var(--ink);
+  background: var(--glass-lift);
+  border-color: var(--glass-line-lift);
+  transform: translateY(-1px);
+}
+
+.navButton:active {
+  transform: translateY(0) scale(0.96);
 }
 
 .hint {
@@ -334,54 +525,80 @@
   font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--ink-muted);
+  color: var(--on-navy-dim);
   white-space: nowrap;
 }
 
 .list {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 28px;
-  border-top: 1px solid var(--line);
-  padding-top: 20px;
+  gap: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding-top: 18px;
 }
 
+/* Each project is a glass pill; the one on screen is lit in the accent. */
 .listItem {
-  border: none;
-  background: none;
   cursor: pointer;
-  padding: 2px 0;
+  padding: 9px 16px;
+  border: 1px solid var(--glass-line);
+  border-radius: 999px;
+  background: var(--glass);
   font-family: var(--font-grotesk), sans-serif;
-  font-size: 15px;
-  color: var(--ink-muted);
+  font-size: 14px;
+  color: var(--on-navy-muted);
   font-weight: 400;
   letter-spacing: -0.01em;
   display: flex;
   align-items: baseline;
-  gap: 8px;
-  transition: color 0.2s;
+  gap: 9px;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.listItem:hover {
+  color: var(--on-navy);
+  background: var(--glass-lift);
+  border-color: var(--glass-line-lift);
+  transform: translateY(-1px);
 }
 
 .listItem[aria-current="true"] {
-  color: var(--ink);
-  font-weight: 600;
+  color: var(--on-navy);
+  font-weight: 500;
+  background: rgba(63, 123, 255, 0.18);
+  border-color: var(--accent-line);
 }
 
 .listIndex {
   font-family: var(--font-mono), monospace;
   font-size: 11px;
-  opacity: 0.7;
+  opacity: 0.65;
 }
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------- responsive ---------- */
 
 @media (max-width: 640px) {
   .header {
-    padding: 24px 20px 0;
+    padding: 22px 20px 0;
   }
 
-  /* The header already wraps this narrow; keep the logo from dwarfing the title. */
   .brandLogo {
-    height: 42px;
-    margin-bottom: 10px;
+    height: 30px;
   }
 
   .footer {
@@ -401,6 +618,11 @@
   .hint {
     display: none;
   }
+
+  .listItem {
+    font-size: 13px;
+    padding: 8px 13px;
+  }
 }
 
 /*
@@ -410,34 +632,44 @@
  */
 @media (max-height: 780px) {
   .header {
-    padding-top: 20px;
+    padding-top: 18px;
   }
 
   .brandLogo {
-    height: 44px;
-    margin-bottom: 8px;
+    height: 30px;
   }
 
   .title {
-    font-size: clamp(24px, 3.2vw, 36px);
+    font-size: clamp(22px, 3vw, 32px);
   }
 
   .counter {
-    font-size: clamp(28px, 4vw, 42px);
+    font-size: clamp(26px, 4vw, 38px);
   }
 
   .footer {
     padding-bottom: 60px;
-    gap: 14px;
+    gap: 13px;
+  }
+
+  .navButton {
+    width: 44px;
+    height: 44px;
+    font-size: 17px;
   }
 
   .list {
-    padding-top: 14px;
+    padding-top: 13px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .page {
+  .page,
+  .waves,
+  .header,
+  .footer,
+  .back,
+  .signout {
     animation: none;
   }
 

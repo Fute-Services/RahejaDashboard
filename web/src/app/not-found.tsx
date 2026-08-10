@@ -5,14 +5,17 @@ import styles from "./not-found.module.css";
 export default function NotFound() {
   return (
     <main className={styles.page}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- bundled brand asset; keeps the raw-<img> convention */}
-      <img
-        className={styles.brandLogo}
-        src="/brand/k-raheja-corp.png"
-        width={198}
-        height={258}
-        alt="K Raheja Corp"
-      />
+      {/* The logo is blue-on-green artwork: it needs a light chip on navy. */}
+      <span className={styles.brandBadge}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- bundled brand asset; keeps the raw-<img> convention */}
+        <img
+          className={styles.brandLogo}
+          src="/brand/k-raheja-corp.png"
+          width={198}
+          height={258}
+          alt="K Raheja Corp"
+        />
+      </span>
       <h1 className={styles.title}>No projects here</h1>
       <p className={styles.body}>
         That city isn&rsquo;t part of the portfolio yet.

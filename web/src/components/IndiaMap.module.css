@@ -182,13 +182,17 @@
   }
 }
 
-/* Covers the flight to a city, handing over to that screen's own fade-in. */
+/*
+ * Covers the flight to a city, handing over to that screen's own fade-in. It
+ * settles on the navy the city showcase opens in — fading to paper white here
+ * would flash light in between the two dark screens.
+ */
 .veil {
   position: absolute;
   inset: 0;
   z-index: 1200;
   pointer-events: none;
-  background: var(--bg);
+  background: var(--navy-deep);
   animation: veilIn 0.76s cubic-bezier(0.5, 0, 0.9, 0.4) both;
 }
 

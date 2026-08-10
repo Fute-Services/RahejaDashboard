@@ -259,7 +259,7 @@ export default function IndiaMap() {
         ))}
       </MapContainer>
 
-      {/* Fades up during the flight, so the next screen arrives out of light. */}
+      {/* Fades up during the flight, so the city screen arrives out of navy. */}
       {leaving && <div className={styles.veil} aria-hidden="true" />}
 
       {/* Google-Maps-style base-layer switcher, bottom-centre. */}
