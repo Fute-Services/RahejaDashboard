@@ -1,9 +1,5 @@
-"use client";
-
-import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Cormorant_Garamond } from "next/font/google";
+import { IndiaOutlineMap } from "./IndiaOutlineMap";
 import styles from "./IntroLanding.module.css";
 
 // The deck this screen is built from sets its display copy in a high-contrast
@@ -15,12 +11,9 @@ const cormorant = Cormorant_Garamond({
   display: "swap",
 });
 
-/** How long the screen takes to fade out before the map takes over. */
-const EXIT_MS = 320;
-
 const STATS = [
-  { value: "60 +", label: "Years of experience" },
-  { value: "Pan Indian", label: "Presence" },
+  { value: "60+", label: "Years of experience" },
+  { value: "Pan-India", label: "Presence" },
   { value: "$6Bn", label: "Market capitalization" },
 ];
 
@@ -65,53 +58,14 @@ const SECTORS = [
   },
 ];
 
-const Sparkle = (
-  <svg
-    className={styles.sparkle}
-    width="17"
-    height="17"
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    aria-hidden="true"
-  >
-    <path d="M12 2.4c.5 3.9 1.4 5.6 3.3 6.9 1 .7 2.3 1.1 4.3 1.4-2 .3-3.3.7-4.3 1.4-1.9 1.3-2.8 3-3.3 6.9-.5-3.9-1.4-5.6-3.3-6.9-1-.7-2.3-1.1-4.3-1.4 2-.3 3.3-.7 4.3-1.4C10.6 8 11.5 6.3 12 2.4Z" />
-    <path d="M19 15.2c.26 1.9.72 2.75 1.68 3.4.5.34 1.15.55 2.14.69-.99.14-1.64.35-2.14.69-.96.65-1.42 1.5-1.68 3.4-.26-1.9-.72-2.75-1.68-3.4-.5-.34-1.15-.55-2.14-.69.99-.14 1.64-.35 2.14-.69.96-.65 1.42-1.5 1.68-3.4Z" />
-  </svg>
-);
-
 /**
- * The screen you land on after signing in: the group's story, its numbers and
- * its sectors, with one way forward — "explore", which opens the India map.
+ * The only screen after signing in: the group's story and its numbers on the
+ * left, the India map on the right. There is no separate map route any more —
+ * the pins on that map are the way onward, and the only one.
  */
 export function IntroLanding() {
-  const router = useRouter();
-  const [leaving, setLeaving] = useState(false);
-
-  // The map is heavy (Leaflet + tiles); fetching it while the visitor reads
-  // means "explore" opens on an already-warm route.
-  useEffect(() => {
-    router.prefetch("/map");
-  }, [router]);
-
-  /** Fades this screen out first, so the map doesn't cut in mid-sentence. */
-  const openMap = useCallback(
-    (e: React.MouseEvent) => {
-      // Let modified clicks (new tab, new window) behave normally.
-      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
-      e.preventDefault();
-      if (leaving) return;
-      setLeaving(true);
-      window.setTimeout(() => router.push("/map"), EXIT_MS);
-    },
-    [leaving, router],
-  );
-
   return (
-    <div
-      className={`${styles.page} ${cormorant.variable} ${
-        leaving ? styles.leaving : ""
-      }`}
-    >
+    <div className={`${styles.page} ${cormorant.variable}`}>
       <div className={styles.backdrop} aria-hidden="true">
         {/* Faint contour lines drifting behind everything. */}
         <svg
@@ -133,11 +87,6 @@ export function IntroLanding() {
         </svg>
       </div>
 
-      <div className={styles.photo} aria-hidden="true">
-        {/* eslint-disable-next-line @next/next/no-img-element -- bundled art direction; keeps the site's raw-<img> convention */}
-        <img className={styles.photoImg} src="/brand/skyline.jpg" alt="" />
-      </div>
-
       <header className={styles.header}>
         <span className={styles.brandBadge}>
           {/* eslint-disable-next-line @next/next/no-img-element -- bundled brand asset; keeps the site's raw-<img> convention */}
@@ -149,7 +98,6 @@ export function IntroLanding() {
             alt="K Raheja Corp"
           />
         </span>
-        <span className={styles.headerMeta}>PORTFOLIO&nbsp;·&nbsp;2026</span>
       </header>
 
       <main className={styles.main}>
@@ -172,24 +120,19 @@ export function IntroLanding() {
             </div>
           ))}
         </div>
-
-        <Link href="/map" className={styles.explore} onClick={openMap}>
-          <span className={styles.exploreBadge}>
-            {/* eslint-disable-next-line @next/next/no-img-element -- bundled brand asset; keeps the site's raw-<img> convention */}
-            <img
-              className={styles.exploreLogo}
-              src="/brand/k-raheja-corp.png"
-              width={198}
-              height={258}
-              alt=""
-            />
-          </span>
-          <span className={styles.exploreCta}>
-            {Sparkle}
-            explore
-          </span>
-        </Link>
       </main>
+
+      {/*
+        The map: every pin on it is a way into a city's projects. It hangs off
+        the page rather than off <main>, because on a wide screen it is anchored
+        to the top-right corner of the whole screen and runs off two edges of it.
+        Sitting here in the DOM also puts it exactly where it belongs once it
+        drops back into the flow on a narrow screen — under the story, above the
+        sector cards.
+      */}
+      <div className={styles.mapZone}>
+        <IndiaOutlineMap />
+      </div>
 
       <section className={styles.sectors} aria-label="Business sectors">
         {SECTORS.map((sector, i) => (

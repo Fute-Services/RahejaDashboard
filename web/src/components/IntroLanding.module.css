@@ -1,11 +1,24 @@
 /*
- * Post-login landing. The navy world defined in globals.css — shared with the
- * login, the showcase and the 404: the group's story on the left, a twilight
- * tower bleeding in from the right, sector cards along the bottom, and one way
- * onward — "explore".
+ * Post-login landing, and the only screen before a city's projects. The navy
+ * world defined in globals.css — shared with the login, the showcase and the
+ * 404: the group's story on the left, the India map on the right, sector cards
+ * along the bottom.
+ *
+ * It is built to be exactly one screen. On anything wide enough to hold the
+ * story beside the map the page is pinned to the viewport and clipped, so
+ * neither axis can ever scroll — which is also what crops the map into the
+ * top-right corner (see .mapZone).
  */
 
 .page {
+  /*
+   * The margin every row on this screen is set against — the mark, the story,
+   * the numbers and the card row all start on it. Narrower than the usual page
+   * gutter, which is what pulls the whole left column out towards the edge, as
+   * on the board.
+   */
+  --gutter: clamp(20px, 2.9vw, 48px);
+
   position: relative;
   min-height: 100vh;
   min-height: 100dvh;
@@ -18,10 +31,13 @@
   animation: pageIn 0.6s ease both;
 }
 
-/* Hands over to the map: this screen recedes rather than being cut away. */
-.leaving {
-  animation: pageOut 0.34s cubic-bezier(0.4, 0, 0.85, 0.3) both;
-  pointer-events: none;
+@media (min-width: 1101px) {
+  .page {
+    height: 100vh;
+    height: 100dvh;
+    /* The map is drawn larger than the screen on purpose; this is the frame. */
+    overflow: hidden;
+  }
 }
 
 /* ---------- backdrop ---------- */
@@ -43,96 +59,44 @@
   animation: drift 30s ease-in-out infinite alternate;
 }
 
-/* ---------- photograph ---------- */
-
-/*
- * Bleeds in from the top-right. The box is sized off the photograph's own
- * aspect ratio (1.465) — width first, height following — so the building is
- * never cropped: it is always shown whole, flush to the top-right corner. The
- * `vh` term keeps it from outgrowing a short screen.
- */
-.photo {
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 0;
-  width: min(68%, 88vh * 1.465, 1240px);
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent 0%,
-    rgba(0, 0, 0, 0.65) 14%,
-    #000 32%
-  );
-  mask-image: linear-gradient(
-    to right,
-    transparent 0%,
-    rgba(0, 0, 0, 0.65) 14%,
-    #000 32%
-  );
-}
-
-/* Height follows the width, so nothing is ever cut off. */
-.photoImg {
-  display: block;
-  width: 100%;
-  height: auto;
-  animation: photoIn 1.4s cubic-bezier(0.2, 0.8, 0.3, 1) both;
-}
-
-/* Grounds the bottom of the frame into the page so the crop never shows. */
-.photo::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(
-      to bottom,
-      rgba(3, 13, 32, 0) 80%,
-      rgba(3, 13, 32, 0.5) 93%,
-      rgba(3, 13, 32, 0.96) 100%
-    ),
-    linear-gradient(
-      100deg,
-      rgba(3, 13, 32, 0.38) 0%,
-      rgba(3, 13, 32, 0) 38%
-    );
-}
-
 /* ---------- header ---------- */
 
 .header {
   position: relative;
   z-index: 2;
+  /*
+   * Never shrink. The page is pinned to the viewport, and a flex column that
+   * runs out of room takes it out of whichever items will give — which squeezed
+   * this row shorter than the logo inside it and clipped the top off the mark.
+   * Only .main gives; the header and the card row hold their size.
+   */
+  flex: none;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 16px;
-  padding: clamp(14px, 2.6vh, 30px) clamp(24px, 5vw, 72px);
+  padding: clamp(14px, 2.6vh, 30px) var(--gutter);
   animation: rise 0.7s ease both;
 }
 
-/* The logo is blue-on-green artwork: it needs a light chip to read on navy. */
+/*
+ * The logo is blue-on-green artwork: it needs a light chip to read on navy.
+ * Sized off viewport height as well as a floor and a ceiling, so it keeps the
+ * weight it has on the board without outgrowing a short laptop screen.
+ */
 .brandBadge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 12px;
-  border-radius: 13px;
+  padding: clamp(10px, 1.4vh, 14px) clamp(14px, 1.9vh, 19px);
+  border-radius: 18px;
   background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 14px 34px -18px rgba(0, 0, 0, 0.9);
+  box-shadow: 0 16px 38px -18px rgba(0, 0, 0, 0.9);
 }
 
 .brandLogo {
-  height: 36px;
+  height: clamp(44px, 6.2vh, 60px);
   width: auto;
   display: block;
-}
-
-.headerMeta {
-  font-family: var(--font-mono), monospace;
-  font-size: 10px;
-  letter-spacing: 0.22em;
-  color: rgba(255, 255, 255, 0.55);
 }
 
 /* ---------- story ---------- */
@@ -140,12 +104,20 @@
 .main {
   position: relative;
   z-index: 2;
+  /* The one row that gives when the screen is short (see .header). */
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  padding: clamp(12px, 2vh, 28px) clamp(24px, 5vw, 72px);
+  padding: clamp(12px, 2vh, 28px) var(--gutter);
+  /*
+   * Sits a little above the middle of its band, as on the board. Room left
+   * under the block is what lifts it: a centred column rises by half of
+   * whatever is added below it.
+   */
+  padding-bottom: calc(clamp(12px, 2vh, 28px) + clamp(30px, 6vh, 72px));
 }
 
 /*
@@ -175,9 +147,24 @@
 }
 
 .stats {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   margin-top: clamp(16px, 3.4vh, 44px);
+  padding-top: clamp(16px, 3.4vh, 40px);
+}
+
+/* A rule drawn across the top of the figures, separating them from the story. */
+.stats::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: min(320px, 100%);
+  height: 1px;
+  background: rgba(255, 255, 255, 0.22);
+  transform-origin: left;
+  animation: growRule 0.8s cubic-bezier(0.2, 0.8, 0.3, 1) 0.3s both;
 }
 
 /* Each figure arrives in turn, and its divider draws itself in behind it. */
@@ -221,129 +208,34 @@
   color: rgba(255, 255, 255, 0.55);
 }
 
-/* ---------- explore button ---------- */
+/* ---------- map ---------- */
 
-.explore {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: clamp(18px, 3.6vh, 46px);
-  padding: 8px 10px 8px 8px;
-  border-radius: 999px;
-  border: 1px solid var(--glass-line);
-  background: var(--glass);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  color: #ffffff;
-  text-decoration: none;
-  animation: rise 0.9s cubic-bezier(0.22, 0.85, 0.3, 1) 0.4s both;
-  transition:
-    transform 0.25s ease,
-    border-color 0.25s ease,
-    background 0.25s ease;
-}
-
-/* Slow halo, so the one action on the screen keeps announcing itself. */
-.explore::before {
-  content: "";
-  position: absolute;
-  inset: -6px;
-  border-radius: inherit;
-  background: radial-gradient(
-    60% 120% at 70% 50%,
-    var(--accent-halo),
-    transparent 70%
-  );
-  opacity: 0.6;
-  z-index: -1;
-  animation: halo 3.4s ease-in-out infinite;
-}
-
-.explore:hover {
-  transform: translateY(-2px);
-  border-color: var(--glass-line-lift);
-  background: var(--glass-lift);
-  color: #ffffff;
-}
-
-.explore:active {
-  transform: translateY(0) scale(0.988);
-  transition-duration: 0.09s;
-}
-
-.explore:focus-visible {
-  outline: 2px solid rgba(140, 180, 255, 0.9);
-  outline-offset: 3px;
-}
-
-.exploreBadge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: clamp(44px, 6.6vh, 52px);
-  height: clamp(44px, 6.6vh, 52px);
-  border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 10px 26px -14px rgba(0, 0, 0, 0.9);
-  flex: none;
-}
-
-.exploreLogo {
-  height: 34px;
-  width: auto;
-  display: block;
-}
-
-.exploreCta {
-  position: relative;
-  overflow: hidden;
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  padding: clamp(12px, 1.9vh, 15px) clamp(24px, 3vw, 30px);
-  border-radius: 999px;
-  font-size: clamp(15px, 1.9vh, 16px);
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  background: var(--accent-pill);
-  background-size: 200% 100%;
-  box-shadow: 0 18px 36px -20px rgba(63, 123, 255, 1);
-  transition: background-position 0.6s ease;
-}
-
-.explore:hover .exploreCta {
-  background-position: 100% 0;
-}
-
-/* Light sweeping across the pill on hover. */
-.exploreCta::after {
-  content: "";
+/*
+ * The map is the right-hand half of this screen, and it is deliberately bigger
+ * than the space it is given: it hangs off the top-right corner so the north of
+ * the country runs past the top edge and the north-east past the right one,
+ * leaving the peninsula — where the projects are — sitting in the open.
+ *
+ * The two translations are percentages of the map's own box, so the crop holds
+ * its proportions at every width: 19% of its width past the right edge, 32% of
+ * its height past the top. The `vh` term caps it on a short screen, where the
+ * sector cards would otherwise meet Kanyakumari.
+ */
+.mapZone {
   position: absolute;
   top: 0;
-  bottom: 0;
-  left: -60%;
-  width: 42%;
-  background: linear-gradient(
-    100deg,
-    transparent,
-    rgba(255, 255, 255, 0.45),
-    transparent
-  );
-  transform: skewX(-18deg);
-  opacity: 0;
-}
-
-.explore:hover .exploreCta::after {
-  animation: sheen 0.9s ease;
-}
-
-.sparkle {
-  animation: twinkle 2.6s ease-in-out infinite;
-}
-
-.explore:hover .sparkle {
-  animation-duration: 1.3s;
+  right: 0;
+  /*
+   * Above .main, not below it. <main> is a full-width block sitting across the
+   * middle of the screen, and a transparent block still swallows every pointer
+   * event over it — which is what stopped the pins answering the mouse at all.
+   * The map lets the pointer through everywhere except its pins (see the map's
+   * own module), so being on top costs nothing.
+   */
+  z-index: 3;
+  width: min(56%, 92vh);
+  transform: translate(19%, -32%);
+  animation: mapIn 1.3s cubic-bezier(0.22, 0.85, 0.3, 1) 0.25s both;
 }
 
 /* ---------- sector cards ---------- */
@@ -351,10 +243,11 @@
 .sectors {
   position: relative;
   z-index: 2;
+  flex: none;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: clamp(10px, 1.1vw, 18px);
-  padding: 0 clamp(24px, 5vw, 72px) clamp(18px, 3vh, 44px);
+  padding: 0 var(--gutter) clamp(18px, 3vh, 44px);
 }
 
 .sector {
@@ -411,14 +304,14 @@
   }
 }
 
-@keyframes pageOut {
+@keyframes growRule {
   from {
-    opacity: 1;
-    transform: scale(1);
+    transform: scaleX(0);
+    opacity: 0;
   }
   to {
-    opacity: 0;
-    transform: scale(1.025);
+    transform: scaleX(1);
+    opacity: 1;
   }
 }
 
@@ -433,6 +326,18 @@
   }
 }
 
+/* Keeps the corner crop while it arrives — a plain `rise` would undo it. */
+@keyframes mapIn {
+  from {
+    opacity: 0;
+    transform: translate(19%, -32%) scale(1.03);
+  }
+  to {
+    opacity: 1;
+    transform: translate(19%, -32%) scale(1);
+  }
+}
+
 @keyframes rise {
   from {
     opacity: 0;
@@ -441,18 +346,6 @@
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-/* No scale here: the photograph must stay whole, so it only slides and fades. */
-@keyframes photoIn {
-  from {
-    opacity: 0;
-    transform: translateX(3%);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
   }
 }
 
@@ -465,41 +358,6 @@
   }
 }
 
-@keyframes halo {
-  0%,
-  100% {
-    opacity: 0.35;
-    transform: scale(0.98);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(1.03);
-  }
-}
-
-@keyframes sheen {
-  from {
-    left: -60%;
-    opacity: 1;
-  }
-  to {
-    left: 120%;
-    opacity: 0;
-  }
-}
-
-@keyframes twinkle {
-  0%,
-  100% {
-    opacity: 0.75;
-    transform: scale(0.92) rotate(0deg);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.1) rotate(12deg);
-  }
-}
-
 /* ---------- responsive ---------- */
 
 /* Tablet: three cards across, so they wrap onto a second row. */
@@ -508,20 +366,22 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .photo {
-    width: min(76%, 84vh * 1.465);
-    opacity: 0.78;
+  /*
+   * Too narrow to hold both the story and the map, so the map stops bleeding
+   * off the corner and drops into the flow between the story and the cards.
+   */
+  .mapZone {
+    position: static;
+    transform: none;
+    width: min(100%, 400px);
+    margin: clamp(20px, 4vh, 38px) auto 0;
+    padding: 0 var(--gutter);
   }
 }
 
 @media (max-width: 780px) {
   .sectors {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .photo {
-    width: 100%;
-    opacity: 0.5;
   }
 
   .title {
@@ -532,53 +392,37 @@
     gap: 16px 0;
   }
 
-  .explore {
-    margin-top: 26px;
-  }
 }
 
 @media (max-width: 520px) {
-  .header {
-    padding-left: 20px;
-    padding-right: 20px;
-  }
-
-  .main,
-  .sectors {
-    padding-left: 20px;
-    padding-right: 20px;
+  .page {
+    --gutter: 20px;
   }
 
   .sectors {
     grid-template-columns: 1fr;
   }
-
-  .exploreCta {
-    padding: 14px 24px;
-    font-size: 15px;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .page,
-  .leaving,
+  .stats::before,
   .waves,
-  .photoImg,
   .header,
   .title,
   .lede,
   .stat,
   .stat + .stat::before,
-  .explore,
-  .explore::before,
-  .sparkle,
   .sector {
     animation: none;
   }
 
-  .explore,
-  .sector,
-  .exploreCta {
+  .sector {
     transition: none;
+  }
+
+  /* Not `animation: none` — that would drop the corner crop with it. */
+  .mapZone {
+    animation-duration: 0.01ms;
   }
 }

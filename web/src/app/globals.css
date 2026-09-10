@@ -1,11 +1,11 @@
 /*
  * Two worlds, one brand.
  *
- * The paper tokens dress the map screen, whose chrome floats over pale tiles.
- * Everything else — login, landing, showcase, 404 — lives in the navy world
- * below. Those screens used to each hardcode their own hexes, which is how the
- * showcase drifted into looking like a different site; they now all read from
- * these tokens instead.
+ * The paper tokens are what is left of the light world — nothing paints with
+ * them now that the tiled map has gone. Login, landing, showcase and 404 all
+ * live in the navy world below. Those screens used to each hardcode their own
+ * hexes, which is how the showcase drifted into looking like a different site;
+ * they now all read from these tokens instead.
  */
 :root {
   --bg: oklch(0.986 0.004 95);
@@ -67,8 +67,8 @@
  * is painted with is what shows through in that gap. Paper white here is what
  * made every navigation flash white between two dark screens.
  *
- * Every screen paints its own background over this — including the map, which
- * is the one paper-white world in the app — so nothing else has to change.
+ * Every screen paints its own background over this, so nothing else has to
+ * change.
  */
 html,
 body {
@@ -123,18 +123,3 @@ button {
   background: oklch(0.55 0.12 255 / 0.22);
 }
 
-/*
- * Leaflet zoom-control chrome, quieted to match the minimal theme. Scoped under
- * .leaflet-container (Leaflet's own wrapper) so the two-class specificity wins
- * over Leaflet's defaults no matter which stylesheet loads last. This lives here
- * rather than in a CSS module, which can't hold pure global selectors.
- */
-.leaflet-container .leaflet-control-zoom a {
-  color: var(--ink);
-  border-color: var(--line);
-}
-
-/* Softens each tile's first paint, so the map fills in rather than snapping. */
-.leaflet-container .leaflet-tile {
-  transition: opacity 0.45s ease;
-}

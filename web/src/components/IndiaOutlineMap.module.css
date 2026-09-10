@@ -1,0 +1,366 @@
+/*
+ * The landing screen's map: India as a hairline outline with a logo pin on every
+ * city that has projects. No tiles, no basemap provider — just the shape, so it
+ * sits inside the navy world instead of punching a pale window through it.
+ */
+
+/*
+ * The box is locked to the SVG's own aspect ratio, which is what lets the pins
+ * be plain HTML: with `xMidYMid meet` on a box of the same ratio the drawing
+ * fills it exactly, so a percentage of the box is a percentage of the viewBox.
+ */
+/*
+ * The box is mostly empty air — India's coastline covers a fraction of it — so
+ * the map as a whole is transparent to the pointer and only the pins take it
+ * back. That way the map can sit above the story without stealing a single
+ * click from it.
+ */
+.map {
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--vb-w) / var(--vb-h);
+  color: #ffffff;
+  pointer-events: none;
+}
+
+.outline {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/*
+ * One state per path, each stroked at full strength and filled just enough to
+ * catch the light. The fade lives on the group, not the paths: a border between
+ * two states is stroked once by each of them, so per-path transparency would
+ * make every internal line twice as bright as the coast.
+ *
+ * `non-scaling-stroke` keeps the hairline a hairline however wide the map is
+ * drawn, which is the whole reason this reads as a drawing rather than a map.
+ */
+.states {
+  fill: rgba(255, 255, 255, 0.05);
+  stroke: #ffffff;
+  stroke-width: 0.9;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.6;
+  filter: drop-shadow(0 0 7px rgba(120, 170, 255, 0.3));
+  /* Without these the arrival scales out of the viewBox's corner, not the map. */
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: landIn 1.4s cubic-bezier(0.25, 0.8, 0.3, 1) 0.15s both;
+}
+
+.states path {
+  vector-effect: non-scaling-stroke;
+}
+
+/* Everything but the chosen pin steps back as the map hands over. */
+.mapLeaving .states {
+  opacity: 0.22;
+  transition: opacity 0.35s ease;
+}
+
+/* ---------- pins ---------- */
+
+.pins {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Zero-sized, so the coordinate itself is the anchor every part hangs off. */
+.pin {
+  position: absolute;
+  width: 0;
+  height: 0;
+  animation: pinIn 0.75s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  animation-delay: calc(0.55s + var(--i) * 0.14s);
+}
+
+/*
+ * The one thing on the map that answers the pointer. Zero-sized itself — the
+ * coordinate is the anchor — so what actually gets hovered and clicked is the
+ * chip, the dot and the name hanging off it, all of which inherit this.
+ */
+.pinButton {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 0.25s ease;
+}
+
+/*
+ * A span rather than a button when the city has no project to open — it still
+ * lights up under the pointer like the rest, it just has nowhere to go.
+ */
+.pinQuiet .pinButton {
+  cursor: default;
+}
+
+.pinButton:hover,
+.pinButton:focus-visible {
+  transform: translateY(-3px);
+}
+
+.pinButton:active {
+  transform: translateY(-1px) scale(0.985);
+}
+
+.pinQuiet .pinButton:active {
+  transform: translateY(-3px);
+}
+
+.pinButton:focus-visible {
+  outline: none;
+}
+
+/*
+ * The white chip carrying the logo. `--dx` and `--stem` come from the component's
+ * de-collision pass, so a chip whose neighbour is close steps aside and floats
+ * higher instead of landing on top of it.
+ */
+.pinBadge {
+  position: absolute;
+  left: var(--dx, 0px);
+  bottom: var(--stem, 34px);
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow:
+    0 14px 30px -14px rgba(0, 0, 0, 0.9),
+    0 0 0 1px rgba(255, 255, 255, 0.5);
+  transition:
+    box-shadow 0.25s ease,
+    background 0.25s ease;
+}
+
+.pinButton:hover .pinBadge,
+.pinButton:focus-visible .pinBadge {
+  background: #ffffff;
+  transform: translateX(-50%) scale(1.09);
+  box-shadow:
+    0 20px 38px -12px rgba(0, 0, 0, 0.95),
+    0 0 0 4px var(--accent-halo);
+}
+
+/* The tether lights up with the chip it holds. */
+.pinButton:hover .pinStem line,
+.pinButton:focus-visible .pinStem line {
+  stroke: rgba(255, 255, 255, 0.95);
+}
+
+.pinLogo {
+  width: auto;
+  height: 30px;
+  display: block;
+}
+
+/* Only shown when a city holds more than one project. */
+.pinCount {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  min-width: 20px;
+  padding: 2px 5px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.8);
+}
+
+/* Ties the chip down to the exact point on the coast, however far it leans. */
+.pinStem {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+}
+
+.pinStem line {
+  stroke: rgba(255, 255, 255, 0.7);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  transition: stroke 0.25s ease;
+}
+
+.pinDot {
+  position: absolute;
+  left: -5px;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.18);
+  transition: box-shadow 0.25s ease;
+}
+
+/*
+ * A ring that keeps travelling outward while the pointer is on the pin — the
+ * live signal that this dot is a way into something.
+ */
+.pinDot::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-line);
+  opacity: 0;
+}
+
+.pinButton:hover .pinDot,
+.pinButton:focus-visible .pinDot {
+  box-shadow: 0 0 0 5px rgba(63, 123, 255, 0.28);
+}
+
+.pinButton:hover .pinDot::after,
+.pinButton:focus-visible .pinDot::after {
+  animation: pinRing 1.3s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+}
+
+.pinButton:hover .pinName,
+.pinButton:focus-visible .pinName {
+  color: #ffffff;
+  text-shadow:
+    0 2px 12px rgba(3, 13, 32, 0.9),
+    0 0 18px rgba(120, 170, 255, 0.65);
+}
+
+/* Names lean away from the middle of their cluster; see placePins(). */
+.pinLeft .pinName {
+  left: auto;
+  right: 15px;
+  text-align: right;
+}
+
+.pinName {
+  position: absolute;
+  left: 15px;
+  top: 0;
+  transform: translateY(-50%);
+  transition:
+    color 0.25s ease,
+    text-shadow 0.25s ease;
+  white-space: nowrap;
+  font-size: clamp(15px, 1.4vw, 24px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  text-shadow: 0 2px 12px rgba(3, 13, 32, 0.9);
+}
+
+/* The pin you picked holds the screen while the rest fade out under it. */
+.mapLeaving .pin {
+  opacity: 0.25;
+  transition: opacity 0.35s ease;
+}
+
+.mapLeaving .pinChosen {
+  opacity: 1;
+  animation: pinChosen 0.42s cubic-bezier(0.3, 0.8, 0.3, 1) both;
+}
+
+/* ---------- keyframes ---------- */
+
+@keyframes landIn {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  to {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+}
+
+@keyframes pinIn {
+  from {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pinRing {
+  0% {
+    opacity: 0.85;
+    transform: scale(0.6);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+}
+
+@keyframes pinChosen {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.12);
+  }
+}
+
+/* ---------- responsive ---------- */
+
+/*
+ * Below the tablet break the map sits behind the story rather than beside it,
+ * so the pins shrink to stay out of the copy's way.
+ */
+@media (max-width: 1100px) {
+  .pinBadge {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+  }
+
+  .pinLogo {
+    height: 25px;
+  }
+
+  .pinName {
+    font-size: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .states,
+  .pin,
+  .mapLeaving .pinChosen,
+  .pinButton:hover .pinDot::after,
+  .pinButton:focus-visible .pinDot::after {
+    animation: none;
+  }
+
+  .pinButton,
+  .pinName {
+    transition: none;
+  }
+}
+

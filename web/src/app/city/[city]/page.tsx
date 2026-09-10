@@ -4,7 +4,7 @@ import { findCity, propertiesForCity } from "@/data/properties";
 
 /**
  * The filtered view: the same coverflow carousel, fed only the projects in one
- * city. Reached by clicking a pin on the map landing. Server component — it
+ * city. Reached by clicking a pin on the landing screen's map. Server component — it
  * resolves the city from the route param and hands a filtered list to the
  * (client) carousel, which already adapts to any list length.
  */
@@ -23,7 +23,7 @@ export default async function CityPage({
   return (
     <PropertyCarousel
       properties={list}
-      backHref="/map"
+      backHref="/"
       cityLabel={cityInfo.name}
     />
   );

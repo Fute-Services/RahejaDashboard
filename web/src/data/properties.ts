@@ -31,13 +31,17 @@ export type City = {
 };
 
 /**
- * City registry — the source of pin coordinates. Only cities that actually have
- * a project get a pin (see {@link citiesWithProjects}), so extra rows here are
- * harmless; a new project just needs its `city` set and a row with coordinates.
+ * City registry — the source of pin coordinates, and what the map draws. Every
+ * row gets a pin whether or not it has a project yet (see {@link mapCities}):
+ * the board this map is built from marks the group's whole footprint, not just
+ * the places already in the showcase. A new project just needs its `city` set
+ * and a row here.
  */
 export const cities: City[] = [
   { id: "mumbai", name: "Mumbai", coordinates: { lat: 19.076, lng: 72.8777 } },
   { id: "pune", name: "Pune", coordinates: { lat: 18.5204, lng: 73.8567 } },
+  { id: "hyderabad", name: "Hyderabad", coordinates: { lat: 17.385, lng: 78.4867 } },
+  { id: "bengaluru", name: "Bengaluru", coordinates: { lat: 12.9716, lng: 77.5946 } },
 ];
 
 /**
@@ -73,19 +77,18 @@ export type CityWithProjects = {
 };
 
 /**
- * Every city that has at least one project, joined to its coordinates. The map
- * renders one pin per entry, so this is the single thing that decides what the
- * map shows — add a project in a new city (with a {@link cities} row) and a pin
- * appears automatically. Order follows the {@link cities} registry.
+ * Every city on the map, joined to whatever projects sit in it — which may be
+ * none. This is the single thing that decides what the map shows: add a row to
+ * {@link cities} and a pin appears, add a project to it and that pin becomes a
+ * way into the showcase. Order follows the registry.
  */
-export function citiesWithProjects(): CityWithProjects[] {
-  return cities
-    .map((city) => ({
-      city,
-      projects: properties.filter((p) => p.city === city.id),
-    }))
-    .filter((entry) => entry.projects.length > 0);
+export function mapCities(): CityWithProjects[] {
+  return cities.map((city) => ({
+    city,
+    projects: properties.filter((p) => p.city === city.id),
+  }));
 }
+
 
 /** Looks up a city by id, or `undefined` if it isn't in the registry. */
 export function findCity(id: string): City | undefined {
