@@ -52,9 +52,12 @@
   --accent-halo: rgba(63, 123, 255, 0.45);
   --accent-line: rgba(140, 180, 255, 0.5);
 
-  /* Sign-out, the only red in the app. */
-  --danger: #d13b32;
-  --danger-deep: #b32c24;
+  /*
+   * Sign-out, the only red in the app — and only under the pointer. The button
+   * sits in the same glass as everything else until you reach for it.
+   */
+  --danger-wash: rgba(209, 59, 50, 0.22);
+  --danger-line: rgba(209, 59, 50, 0.65);
 }
 
 * {

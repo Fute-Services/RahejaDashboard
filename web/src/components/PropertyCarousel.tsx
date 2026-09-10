@@ -503,7 +503,7 @@ export function PropertyCarousel({
         onClick={signOut}
         aria-label="Log out"
       >
-        Log out ↗
+        Log out
       </button>
     </div>
   );

@@ -170,7 +170,13 @@
   transform: translateY(0) scale(0.985);
 }
 
-/* Floating logout, pinned bottom-right — solid red, matching the map screen. */
+/*
+ * Floating logout, pinned bottom-right, and the twin of "← Map" on the other
+ * side: same glass, same mono type, same pill. It used to be a solid red slab,
+ * which was the one loud thing on a screen made of quiet glass — the red now
+ * only comes up under the pointer, where it says "this signs you out" without
+ * shouting it across the corner all the time.
+ */
 .signout {
   position: fixed;
   right: 20px;
@@ -180,24 +186,27 @@
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #ffffff;
-  background: var(--danger);
-  border: none;
+  color: var(--on-navy-muted);
+  background: var(--glass);
+  border: 1px solid var(--glass-line);
   border-radius: 999px;
   padding: 10px 18px;
   cursor: pointer;
-  box-shadow: 0 6px 18px -6px rgba(209, 59, 50, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   transition:
+    color 0.2s ease,
     background 0.2s ease,
-    box-shadow 0.25s ease,
+    border-color 0.2s ease,
     transform 0.2s ease;
   animation: chromeIn 0.6s ease 0.45s both;
 }
 
 .signout:hover {
-  background: var(--danger-deep);
+  color: #ffffff;
+  background: var(--danger-wash);
+  border-color: var(--danger-line);
   transform: translateY(-1px);
-  box-shadow: 0 10px 24px -6px rgba(209, 59, 50, 0.75);
 }
 
 .signout:active {
