@@ -95,6 +95,11 @@ export function findCity(id: string): City | undefined {
   return cities.find((city) => city.id === id);
 }
 
+/** Looks up a project by slug, or `undefined` if there is none. */
+export function findProperty(slug: string): Property | undefined {
+  return properties.find((p) => p.slug === slug);
+}
+
 /** The projects in a given city, in list order. Empty if the city is unknown. */
 export function propertiesForCity(id: string): Property[] {
   return properties.filter((p) => p.city === id);

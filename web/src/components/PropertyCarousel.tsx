@@ -421,9 +421,7 @@ export function PropertyCarousel({
                       </div>
                       <a
                         className={styles.cardLink}
-                        href={property.href}
-                        target="_blank"
-                        rel="noreferrer"
+                        href={`/property/${property.slug}`}
                       >
                         Visit&nbsp;&#8599;
                       </a>
