@@ -229,11 +229,7 @@ export default function LoginPage() {
             <span className={styles.eyebrowDot} aria-hidden="true" />
             WELCOME&nbsp;BACK
           </div>
-          <h1 className={styles.title}>KRAHEJA</h1>
-          <p className={styles.lede}>
-            Sign in to manage your property portfolio, track projects and access
-            secure documents.
-          </p>
+          <h1 className={styles.title}>K RAHEJA</h1>
           <div className={styles.introFoot}>
             <div className={styles.rule} />
             {/*

@@ -213,14 +213,6 @@
   color: transparent;
 }
 
-.lede {
-  margin: clamp(14px, 2.4vh, 22px) 0 0;
-  font-size: clamp(14px, min(1.1vw, 2.1vh), 16px);
-  line-height: 1.65;
-  color: rgba(255, 255, 255, 0.74);
-  max-width: 380px;
-}
-
 .introFoot {
   margin-top: clamp(20px, 4.4vh, 46px);
   display: flex;
@@ -794,10 +786,6 @@
   /* No room for the proof strip beside a full-width card — the form wins. */
   .introFoot {
     display: none;
-  }
-
-  .lede {
-    font-size: 14px;
   }
 }
 
